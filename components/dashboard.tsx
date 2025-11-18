@@ -61,14 +61,35 @@ export default function Dashboard({ data, onRefresh }) {
 
   const handleExportSales = async () => {
     try {
+      if (!salesData || salesData.length === 0) {
+        toast({
+          title: "No Data",
+          description: "No sales data available to export",
+          variant: "destructive",
+        });
+        return;
+      }
+
       const csv = generateSalesCSV(salesData);
       const filename = `sales_${new Date().toISOString().split("T")[0]}.csv`;
-      downloadCSV(csv, filename);
+
+      // Create a blob and download link
+      const blob = new Blob([csv], { type: "text/csv" });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
       toast({
         title: "Success",
         description: "Sales report exported successfully",
       });
     } catch (error) {
+      console.error("Export error:", error);
       toast({
         title: "Error",
         description: "Failed to export sales report",
@@ -116,16 +137,25 @@ export default function Dashboard({ data, onRefresh }) {
   }));
 
   const fundData = [
-    { name: "Business Fund", value: data?.businessFund || 0, fill: "#f59e0b" },
+    {
+      name: "Business Fund",
+      value: (data?.businessFund || 0).toFixed(2),
+      fill: "#f59e0b",
+    },
     {
       name: "Employee Share",
-      value: data?.employeeShare || 0,
+      value: (data?.employeeShare || 0).toFixed(2),
       fill: "#06b6d4",
     },
     {
       name: "Investor Share",
-      value: data?.investorShare || 0,
+      value: (data?.investorShare || 0).toFixed(2),
       fill: "#8b5cf6",
+    },
+    {
+      name: "Savings",
+      value: (data?.savings || 0).toFixed(2),
+      fill: "#10b981",
     },
   ];
 

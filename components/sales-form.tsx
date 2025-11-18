@@ -26,6 +26,10 @@ export default function SalesForm({ onSuccess }) {
     quantity: "",
     price: "",
     employee: employees[0],
+    businessFund: "0",
+    employeeShare: "0",
+    investorShare: "0",
+    savings: "0",
   });
 
   const handleChange = (e) => {
@@ -45,29 +49,37 @@ export default function SalesForm({ onSuccess }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("Form submission started"); // Debug log
 
-    const validationErrors = validateSale(formData);
-    if (validationErrors.length > 0) {
-      const errorMap = validationErrors.reduce((acc, err) => {
-        acc[err.field] = err.message;
-        return acc;
-      }, {} as Record<string, string>);
-      setErrors(errorMap);
-      toast({
-        title: "Validation Error",
-        description: "Please fix the errors in the form",
-        variant: "destructive",
-      });
-      return;
-    }
+    // Calculate values before submission
+    const total = Number(formData.quantity) * Number(formData.price);
+    const businessFund = (total * 6) / 10;
+    const employeeShare = (total * 1.5) / 10;
+    const investorShare = (total * 1.5) / 10;
+    const savings = (total * 1) / 10;
+
+    const submissionData = {
+      ...formData,
+      total: Math.round(total * 100) / 100,
+      businessFund: Math.round(businessFund * 100) / 100,
+      employeeShare: Math.round(employeeShare * 100) / 100,
+      investorShare: Math.round(investorShare * 100) / 100,
+      savings: Math.round(savings * 100) / 100,
+    };
+
+    console.log("Submitting data:", submissionData); // Debug log
 
     setLoading(true);
     try {
       const response = await fetch("/api/sales", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(submissionData),
       });
+
+      const responseData = await response.json();
+      console.log("API response:", responseData); // Debug log
+
       if (response.ok) {
         toast({
           title: "Success",
@@ -79,17 +91,22 @@ export default function SalesForm({ onSuccess }) {
           quantity: "",
           price: "",
           employee: employees[0],
+          businessFund: "0",
+          employeeShare: "0",
+          investorShare: "0",
+          savings: "0",
         });
         setErrors({});
         onSuccess();
       } else {
         toast({
           title: "Error",
-          description: "Failed to record sale",
+          description: responseData.error || "Failed to record sale",
           variant: "destructive",
         });
       }
     } catch (error) {
+      console.error("Submission error:", error); // Debug log
       toast({
         title: "Error",
         description: "Failed to record sale",
@@ -106,10 +123,20 @@ export default function SalesForm({ onSuccess }) {
           Number.parseFloat(formData.quantity) *
           Number.parseFloat(formData.price)
         ).toFixed(2)
-      : 0;
-  const businessFund = ((totalSales * 7) / 10).toFixed(2);
-  const employeeShare = ((totalSales * 2) / 10).toFixed(2);
-  const investorShare = ((totalSales * 1) / 10).toFixed(2);
+      : "0.00";
+
+  const businessFund = totalSales
+    ? ((Number(totalSales) * 6) / 10).toFixed(2)
+    : "0.00";
+  const employeeShare = totalSales
+    ? ((Number(totalSales) * 1.5) / 10).toFixed(2)
+    : "0.00";
+  const investorShare = totalSales
+    ? ((Number(totalSales) * 1.5) / 10).toFixed(2)
+    : "0.00";
+  const savings = totalSales
+    ? ((Number(totalSales) * 1) / 10).toFixed(2)
+    : "0.00";
 
   return (
     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -207,6 +234,10 @@ export default function SalesForm({ onSuccess }) {
               type="submit"
               disabled={loading}
               className="w-full bg-accent hover:bg-accent/90"
+              onClick={(e) => {
+                console.log("Button clicked"); // Debug log
+                handleSubmit(e);
+              }}
             >
               {loading ? "Recording..." : "Record Sale"}
             </Button>
@@ -229,7 +260,7 @@ export default function SalesForm({ onSuccess }) {
           <div className="space-y-3">
             <div className="flex justify-between items-center p-3 bg-muted/50 rounded border border-border">
               <span className="text-sm text-foreground">
-                Business Fund (7/10)
+                Business Fund (6/10)
               </span>
               <span className="font-semibold text-accent">
                 GHS {businessFund}
@@ -237,7 +268,7 @@ export default function SalesForm({ onSuccess }) {
             </div>
             <div className="flex justify-between items-center p-3 bg-muted/50 rounded border border-border">
               <span className="text-sm text-foreground">
-                Employee Share (2/10)
+                Employee Share (1.5/10)
               </span>
               <span className="font-semibold text-cyan-400">
                 GHS {employeeShare}
@@ -245,10 +276,16 @@ export default function SalesForm({ onSuccess }) {
             </div>
             <div className="flex justify-between items-center p-3 bg-muted/50 rounded border border-border">
               <span className="text-sm text-foreground">
-                Investor Share (1/10)
+                Investor Share (1.5/10)
               </span>
               <span className="font-semibold text-purple-400">
                 GHS {investorShare}
+              </span>
+            </div>
+            <div className="flex justify-between items-center p-3 bg-muted/50 rounded border border-border">
+              <span className="text-sm text-foreground">Savings (1/10)</span>
+              <span className="font-semibold text-green-400">
+                GHS {savings}
               </span>
             </div>
           </div>

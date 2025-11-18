@@ -11,6 +11,7 @@ export interface Sale {
   businessFund: number
   employeeShare: number
   investorShare: number
+  savings: number;
 }
 
 export interface Expense {
@@ -50,14 +51,17 @@ export interface FinancialSummary {
 
 // Calculate fund split from sales
 export function calculateSaleSplit(total: number) {
-  const businessFund = (total * 7) / 10
-  const employeeShare = (total * 2) / 10
-  const investorShare = (total * 1) / 10
+  const businessFund = (total * 6) / 10  // Changed from 7/10 to 6/10
+  const employeeShare = (total * 1.5) / 10  // Changed from 2/10 to 1.5/10
+  const investorShare = (total * 1.5) / 10  // Changed from 1/10 to 1.5/10
+  const savings = (total * 1) / 10  // Added new savings field
+
 
   return {
     businessFund: Math.round(businessFund * 100) / 100,
     employeeShare: Math.round(employeeShare * 100) / 100,
     investorShare: Math.round(investorShare * 100) / 100,
+    savings: Math.round(savings * 100) / 100, 
   }
 }
 

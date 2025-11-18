@@ -20,6 +20,7 @@ export function generateSalesCSV(sales: Sale[]): string {
     "Business Fund (GHS)",
     "Employee Share (GHS)",
     "Investor Share (GHS)",
+    "Savings (GHS)",  // Added this header
   ]
   const rows = sales.map((sale) => [
     sale.date,
@@ -30,6 +31,7 @@ export function generateSalesCSV(sales: Sale[]): string {
     sale.businessFund.toFixed(2),
     sale.employeeShare.toFixed(2),
     sale.investorShare.toFixed(2),
+    sale.savings.toFixed(2),  // Added this field
   ])
 
   return [headers, ...rows].map((row) => row.map(escapeCSV).join(",")).join("\n")
@@ -74,6 +76,7 @@ export function generateFinancialSummaryCSV(summary: FinancialSummary): string {
     ["Business Fund", summary.businessFund.toFixed(2)],
     ["Employee Share", summary.employeeShare.toFixed(2)],
     ["Investor Share", summary.investorShare.toFixed(2)],
+    ["Savings", summary.savings?.toFixed(2) || "0.00"],
     [],
     ["Owner Transactions", ""],
     ["Withdrawals", summary.ownerWithdrawals.toFixed(2)],

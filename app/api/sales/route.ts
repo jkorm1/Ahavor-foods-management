@@ -4,27 +4,39 @@ import { addSale } from "@/lib/transaction-store"
 export async function POST(request: Request) {
   try {
     const data = await request.json()
+    
+    // Validate required fields
+    if (!data.date || !data.employee || !data.product || !data.quantity || !data.price) {
+      return Response.json({ error: "Missing required fields" }, { status: 400 })
+    }
 
     const total = Number(data.quantity) * Number(data.price)
-    const split = calculateSaleSplit(total)
+    
+    // Validate the calculated values
+    if (isNaN(total) || total <= 0) {
+      return Response.json({ error: "Invalid total amount" }, { status: 400 })
+    }
 
     const sale = await addSale({
       date: data.date,
-      employee: data.employee, // Add employee tracking
+      employee: data.employee,
       product: data.product,
       quantity: Number(data.quantity),
       price: Number(data.price),
       total: Math.round(total * 100) / 100,
-      businessFund: split.businessFund,
-      employeeShare: split.employeeShare,
-      investorShare: split.investorShare,
+      businessFund: Number(data.businessFund),
+      employeeShare: Number(data.employeeShare),
+      investorShare: Number(data.investorShare),
+      savings: Number(data.savings),
     })
 
     return Response.json({ success: true, data: sale })
   } catch (error) {
-    return Response.json({ error: "Failed to record sale" }, { status: 400 })
+    console.error("Sales API error:", error)
+    return Response.json({ error: "Failed to record sale" }, { status: 500 })
   }
 }
+
 
 export async function GET() {
   try {

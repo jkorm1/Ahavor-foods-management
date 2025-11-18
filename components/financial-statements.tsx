@@ -1,14 +1,20 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function FinancialStatements({ data }) {
-  const grossProfit = (data?.totalSales || 0) - (data?.costOfGoods || 0)
-  const netProfit = grossProfit - (data?.totalExpenses || 0)
-  const totalAssets = (data?.businessFund || 0) + (data?.cash || 0)
-  const totalLiabilities = data?.ownerWithdrawals || 0
-  const ownerEquity = totalAssets - totalLiabilities
+  const grossProfit = (data?.totalSales || 0) - (data?.costOfGoods || 0);
+  const netProfit = grossProfit - (data?.totalExpenses || 0);
+  const totalAssets = (data?.businessFund || 0) + (data?.cash || 0);
+  const totalLiabilities = data?.ownerWithdrawals || 0;
+  const ownerEquity = totalAssets - totalLiabilities;
 
   return (
     <Tabs defaultValue="income" className="w-full">
@@ -37,11 +43,15 @@ export default function FinancialStatements({ data }) {
             <div className="space-y-3">
               <div className="flex justify-between p-3 border-b border-border">
                 <span className="text-foreground">Total Sales</span>
-                <span className="font-semibold text-accent">GHS {data?.totalSales || 0}</span>
+                <span className="font-semibold text-accent">
+                  GHS {data?.totalSales || 0}
+                </span>
               </div>
               <div className="flex justify-between p-3 border-b border-border">
                 <span className="text-foreground">Cost of Goods Sold</span>
-                <span className="font-semibold text-destructive">- GHS {data?.costOfGoods || 0}</span>
+                <span className="font-semibold text-destructive">
+                  - GHS {data?.costOfGoods || 0}
+                </span>
               </div>
               <div className="flex justify-between p-3 bg-muted rounded font-semibold mb-4">
                 <span className="text-foreground">Gross Profit</span>
@@ -49,11 +59,19 @@ export default function FinancialStatements({ data }) {
               </div>
               <div className="flex justify-between p-3 border-b border-border">
                 <span className="text-foreground">Total Expenses</span>
-                <span className="font-semibold text-destructive">- GHS {data?.totalExpenses || 0}</span>
+                <span className="font-semibold text-destructive">
+                  - GHS {data?.totalExpenses || 0}
+                </span>
               </div>
               <div className="flex justify-between p-3 bg-accent/10 rounded border border-accent/50">
-                <span className="text-foreground font-semibold">Net Profit</span>
-                <span className={`font-bold text-lg ${netProfit >= 0 ? "text-green-500" : "text-destructive"}`}>
+                <span className="text-foreground font-semibold">
+                  Net Profit
+                </span>
+                <span
+                  className={`font-bold text-lg ${
+                    netProfit >= 0 ? "text-green-500" : "text-destructive"
+                  }`}
+                >
                   GHS {netProfit}
                 </span>
               </div>
@@ -71,15 +89,21 @@ export default function FinancialStatements({ data }) {
           <CardContent>
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <div>
-                <h3 className="font-semibold text-foreground mb-4 pb-2 border-b border-border">Assets</h3>
+                <h3 className="font-semibold text-foreground mb-4 pb-2 border-b border-border">
+                  Assets
+                </h3>
                 <div className="space-y-3">
                   <div className="flex justify-between p-2">
                     <span className="text-muted-foreground">Business Fund</span>
-                    <span className="text-foreground">GHS {data?.businessFund || 0}</span>
+                    <span className="text-foreground">
+                      GHS {data?.businessFund || 0}
+                    </span>
                   </div>
                   <div className="flex justify-between p-2">
                     <span className="text-muted-foreground">Cash Balance</span>
-                    <span className="text-foreground">GHS {data?.cash || 0}</span>
+                    <span className="text-foreground">
+                      GHS {data?.cash || 0}
+                    </span>
                   </div>
                   <div className="flex justify-between p-2 bg-muted rounded font-semibold">
                     <span className="text-foreground">Total Assets</span>
@@ -89,19 +113,33 @@ export default function FinancialStatements({ data }) {
               </div>
 
               <div>
-                <h3 className="font-semibold text-foreground mb-4 pb-2 border-b border-border">Liabilities & Equity</h3>
+                <h3 className="font-semibold text-foreground mb-4 pb-2 border-b border-border">
+                  Liabilities & Equity
+                </h3>
                 <div className="space-y-3">
                   <div className="flex justify-between p-2">
-                    <span className="text-muted-foreground">Owner's Withdrawals</span>
-                    <span className="text-destructive">GHS {data?.ownerWithdrawals || 0}</span>
+                    <span className="text-muted-foreground">
+                      Owner's Withdrawals
+                    </span>
+                    <span className="text-destructive">
+                      GHS {data?.ownerWithdrawals || 0}
+                    </span>
                   </div>
                   <div className="flex justify-between p-2">
                     <span className="text-muted-foreground">Employee Fund</span>
-                    <span className="text-foreground">GHS {data?.employeeShare || 0}</span>
+                    <span className="text-foreground">
+                      GHS {data?.employeeShare || 0}
+                    </span>
                   </div>
                   <div className="flex justify-between p-2 bg-accent/10 rounded font-semibold">
                     <span className="text-foreground">Owner's Equity</span>
-                    <span className={ownerEquity >= 0 ? "text-green-500" : "text-destructive"}>GHS {ownerEquity}</span>
+                    <span
+                      className={
+                        ownerEquity >= 0 ? "text-green-500" : "text-destructive"
+                      }
+                    >
+                      GHS {ownerEquity}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -119,28 +157,44 @@ export default function FinancialStatements({ data }) {
           <CardContent>
             <div className="space-y-4">
               <div className="p-4 bg-muted rounded border border-border">
-                <h4 className="font-semibold text-foreground mb-3">Operating Activities</h4>
+                <h4 className="font-semibold text-foreground mb-3">
+                  Operating Activities
+                </h4>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Sales collected</span>
-                    <span className="text-accent">+ GHS {data?.totalSales || 0}</span>
+                    <span className="text-muted-foreground">
+                      Sales collected
+                    </span>
+                    <span className="text-accent">
+                      + GHS {data?.totalSales || 0}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Expenses paid</span>
-                    <span className="text-destructive">- GHS {data?.totalExpenses || 0}</span>
+                    <span className="text-destructive">
+                      - GHS {data?.totalExpenses || 0}
+                    </span>
                   </div>
                 </div>
               </div>
 
               <div className="p-4 bg-muted rounded border border-border">
-                <h4 className="font-semibold text-foreground mb-3">Financing Activities</h4>
+                <h4 className="font-semibold text-foreground mb-3">
+                  Financing Activities
+                </h4>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Owner withdrawals</span>
-                    <span className="text-destructive">- GHS {data?.ownerWithdrawals || 0}</span>
+                    <span className="text-muted-foreground">
+                      Owner withdrawals
+                    </span>
+                    <span className="text-destructive">
+                      - GHS {data?.ownerWithdrawals || 0}
+                    </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Owner repayments</span>
+                    <span className="text-muted-foreground">
+                      Owner repayments
+                    </span>
                     <span className="text-green-500">+ GHS 0</span>
                   </div>
                 </div>
@@ -164,19 +218,29 @@ export default function FinancialStatements({ data }) {
               </div>
               <div className="flex justify-between p-3 border-b border-border">
                 <span className="text-foreground">Add: Net Profit</span>
-                <span className="font-semibold text-green-500">+ GHS {netProfit > 0 ? netProfit : 0}</span>
+                <span className="font-semibold text-green-500">
+                  + GHS {netProfit > 0 ? netProfit : 0}
+                </span>
               </div>
               <div className="flex justify-between p-3 border-b border-border">
                 <span className="text-foreground">Less: Withdrawals</span>
-                <span className="font-semibold text-destructive">- GHS {data?.ownerWithdrawals || 0}</span>
+                <span className="font-semibold text-destructive">
+                  - GHS {data?.ownerWithdrawals || 0}
+                </span>
               </div>
               <div className="flex justify-between p-3 border-b border-border">
                 <span className="text-foreground">Add: Repayments</span>
                 <span className="font-semibold text-green-500">+ GHS 0</span>
               </div>
               <div className="flex justify-between p-3 bg-accent/10 rounded border border-accent/50">
-                <span className="text-foreground font-semibold">Closing Capital</span>
-                <span className={`font-bold text-lg ${ownerEquity >= 0 ? "text-green-500" : "text-destructive"}`}>
+                <span className="text-foreground font-semibold">
+                  Closing Capital
+                </span>
+                <span
+                  className={`font-bold text-lg ${
+                    ownerEquity >= 0 ? "text-green-500" : "text-destructive"
+                  }`}
+                >
                   GHS {ownerEquity}
                 </span>
               </div>
@@ -185,5 +249,5 @@ export default function FinancialStatements({ data }) {
         </Card>
       </TabsContent>
     </Tabs>
-  )
+  );
 }

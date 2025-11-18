@@ -8,7 +8,7 @@ function saleToRow(sale: Sale): string[] {
   return [
     sale.id,
     sale.date,
-    sale.employee, // Include employee
+    sale.employee,
     sale.product,
     String(sale.quantity),
     String(sale.price),
@@ -16,9 +16,9 @@ function saleToRow(sale: Sale): string[] {
     String(sale.businessFund),
     String(sale.employeeShare),
     String(sale.investorShare),
+    String(sale.savings),
   ]
 }
-
 function expenseToRow(expense: Expense): string[] {
   return [expense.id, expense.date, expense.category, expense.description, String(expense.amount)]
 }
@@ -31,7 +31,7 @@ function rowToSale(row: string[]): Sale {
   return {
     id: row[0],
     date: row[1],
-    employee: row[2], // Handle missing employee
+    employee: row[2],
     product: row[3],
     quantity: Number(row[4]),
     price: Number(row[5]),
@@ -39,6 +39,7 @@ function rowToSale(row: string[]): Sale {
     businessFund: Number(row[7]),
     employeeShare: Number(row[8]),
     investorShare: Number(row[9]),
+    savings: Number(row[10]),
   }
 }
 

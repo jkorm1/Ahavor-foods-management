@@ -52,6 +52,7 @@ export async function POST(request: NextRequest) {
           "Business Fund",
           "Employee Share",
           "Investor Share",
+          "Savings",
         ],
       },
       { name: "Expenses", headers: ["ID", "Date", "Category", "Description", "Amount", "Notes"] },
