@@ -31,30 +31,29 @@ export function LayoutClient({ children }: { children: React.ReactNode }) {
               <span className="hidden font-bold sm:inline-block">StarPops</span>
             </Link>
           </div>
-          <nav className="flex items-center justify-between">
-            <div className="flex items-center space-x-6 text-sm font-medium">
-              <Link
-                href="/"
-                className="transition-colors hover:text-foreground/80 text-foreground/60"
-              >
-                Dashboard
-              </Link>
-              <Link
-                href="/tables"
-                className="transition-colors hover:text-foreground/80 text-foreground/60"
-              >
-                Tables
-              </Link>
-              <Link
-                href="/setup"
-                className="transition-colors hover:text-foreground/80 text-foreground/60"
-              >
-                Setup
-              </Link>
-            </div>
-            <LogoutButton />
-          </nav>
+
+          <div className="flex items-center space-x-6 text-sm font-medium">
+            <Link
+              href="/"
+              className="transition-colors hover:text-foreground/80 text-foreground/60"
+            >
+              Dashboard
+            </Link>
+            <Link
+              href="/tables"
+              className="transition-colors hover:text-foreground/80 text-foreground/60"
+            >
+              Tables
+            </Link>
+            <Link
+              href="/setup"
+              className="transition-colors hover:text-foreground/80 text-foreground/60"
+            >
+              Setup
+            </Link>
+          </div>
         </NavigationMenuList>
+        <LogoutButton />
       </NavigationMenu>
       <main className="container mx-auto">
         <AuthGuard>{children}</AuthGuard>

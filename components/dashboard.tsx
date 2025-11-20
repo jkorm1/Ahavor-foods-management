@@ -33,6 +33,7 @@ import {
 import { getSales, getExpenses } from "@/lib/transaction-store";
 import { useEffect, useState } from "react";
 import SalesTable from "@/components/sales-table";
+import InvestorProgress from "./investor-progress";
 
 export default function Dashboard({ data, onRefresh }) {
   const { toast } = useToast();
@@ -131,11 +132,16 @@ export default function Dashboard({ data, onRefresh }) {
     return acc;
   }, []);
 
-  // Map expensesData into chart‑friendly format
-  const expenseData = expensesData.map((exp) => ({
-    name: exp.category,
-    value: exp.amount,
-  }));
+  // Transform expensesData to accumulate by category
+  const expenseData = expensesData.reduce((acc, exp) => {
+    const existing = acc.find((item) => item.name === exp.category);
+    if (existing) {
+      existing.value += exp.amount;
+    } else {
+      acc.push({ name: exp.category, value: exp.amount });
+    }
+    return acc;
+  }, []);
 
   // Calculate fund totals from sales data instead of using props
   const fundTotals = salesData.reduce(
@@ -302,6 +308,8 @@ export default function Dashboard({ data, onRefresh }) {
             </ResponsiveContainer>
           </CardContent>
         </Card>
+
+        <InvestorProgress currentAmount={fundTotals.investorShare} />
 
         {/* Expense Breakdown */}
         <Card className="bg-card border-border col-span-1 md:col-span-2">
