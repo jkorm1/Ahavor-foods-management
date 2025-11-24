@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { validateSale } from "@/lib/validation";
 
-const employees = ["John", "Mary", "Peter", "Sarah"];
+const employees = ["Joseph Korm", "Alvin", "Peter", "Sarah"];
 
 export default function SalesForm({ onSuccess }) {
   const { toast } = useToast();

@@ -53,7 +53,7 @@ export function InvestorLogin() {
               />
               {error && <p className="text-sm text-red-500">{error}</p>}
             </div>
-            <Button type="submit" className="w-full" size="lg">
+            <Button type="submit" className="w-full bg-yellow-600 text-white">
               Access System
             </Button>
           </form>
