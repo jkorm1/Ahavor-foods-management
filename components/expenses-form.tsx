@@ -34,6 +34,7 @@ const expenseCategories = [
   "Tissue",
   "Packaging",
   "Transport",
+  "Fuel or Prepaid",
   "Utilities",
   "Other",
 ];

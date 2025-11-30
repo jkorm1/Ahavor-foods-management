@@ -1,11 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import {
-  NavigationMenu,
-  NavigationMenuItem,
-  NavigationMenuList,
-} from "@/components/ui/navigation-menu";
+import { usePathname } from "next/navigation";
 import { InvestorLogin } from "@/components/investor-login";
 import { useAuth } from "@/contexts/auth-context";
 import { LogoutButton } from "@/components/logout-button";
@@ -39,19 +35,31 @@ export function LayoutClient({ children }: { children: React.ReactNode }) {
           <div className="flex items-center space-x-6 text-sm font-medium">
             <Link
               href="/"
-              className="transition-colors hover:text-foreground/80 text-foreground/60"
+              className={`transition-colors hover:text-foreground/80 hover:underline ${
+                usePathname() === "/"
+                  ? "text-foreground border-b-2 border-primary"
+                  : "text-foreground/60"
+              }`}
             >
               Dashboard
             </Link>
             <Link
               href="/tables"
-              className="transition-colors hover:text-foreground/80 text-foreground/60"
+              className={`transition-colors hover:text-foreground/80 hover:underline ${
+                usePathname() === "/tables"
+                  ? "text-foreground border-b-2 border-primary"
+                  : "text-foreground/60"
+              }`}
             >
               Tables
             </Link>
             <Link
               href="/setup"
-              className="transition-colors hover:text-foreground/80 text-foreground/60"
+              className={`transition-colors hover:text-foreground/80 hover:underline ${
+                usePathname() === "/setup"
+                  ? "text-foreground border-b-2 border-primary"
+                  : "text-foreground/60"
+              }`}
             >
               Setup
             </Link>

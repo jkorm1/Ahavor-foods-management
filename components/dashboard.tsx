@@ -32,7 +32,6 @@ import {
 } from "@/lib/csv-export";
 import { getSales, getExpenses } from "@/lib/transaction-store";
 import { useEffect, useState } from "react";
-import SalesTable from "@/components/sales-table";
 import InvestorProgress from "./investor-progress";
 
 export default function Dashboard({ data, onRefresh }) {
@@ -320,7 +319,7 @@ export default function Dashboard({ data, onRefresh }) {
           </CardContent>
         </Card>
 
-        <InvestorProgress currentAmount={fundTotals.investorShare} />
+        <InvestorProgress salesData={salesData} />
 
         {/* Expense Breakdown */}
         <Card className="bg-card border-border col-span-1 md:col-span-2">

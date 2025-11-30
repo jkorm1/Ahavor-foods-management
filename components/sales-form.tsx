@@ -26,10 +26,6 @@ export default function SalesForm({ onSuccess }) {
     quantity: "",
     price: "",
     employee: employees[0],
-    businessFund: "0",
-    employeeShare: "0",
-    investorShare: "0",
-    savings: "0",
   });
 
   const handleChange = (e) => {
@@ -49,7 +45,6 @@ export default function SalesForm({ onSuccess }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form submission started"); // Debug log
 
     // Calculate values before submission
     const total = Number(formData.quantity) * Number(formData.price);
@@ -67,8 +62,6 @@ export default function SalesForm({ onSuccess }) {
       savings: Math.round(savings * 100) / 100,
     };
 
-    console.log("Submitting data:", submissionData); // Debug log
-
     setLoading(true);
     try {
       const response = await fetch("/api/sales", {
@@ -78,7 +71,6 @@ export default function SalesForm({ onSuccess }) {
       });
 
       const responseData = await response.json();
-      console.log("API response:", responseData); // Debug log
 
       if (response.ok) {
         toast({
@@ -91,10 +83,6 @@ export default function SalesForm({ onSuccess }) {
           quantity: "",
           price: "",
           employee: employees[0],
-          businessFund: "0",
-          employeeShare: "0",
-          investorShare: "0",
-          savings: "0",
         });
         setErrors({});
         onSuccess();
@@ -106,7 +94,6 @@ export default function SalesForm({ onSuccess }) {
         });
       }
     } catch (error) {
-      console.error("Submission error:", error); // Debug log
       toast({
         title: "Error",
         description: "Failed to record sale",
@@ -133,7 +120,7 @@ export default function SalesForm({ onSuccess }) {
     : "0.00";
   const investorShare = totalSales
     ? ((Number(totalSales) * 1.5) / 10).toFixed(2)
-    : "0.00"; // Changed from 1 to 1.5
+    : "0.00";
   const savings = totalSales
     ? ((Number(totalSales) * 1) / 10).toFixed(2)
     : "0.00";
@@ -234,10 +221,6 @@ export default function SalesForm({ onSuccess }) {
               type="submit"
               disabled={loading}
               className="w-full bg-accent hover:bg-accent/90"
-              onClick={(e) => {
-                console.log("Button clicked"); // Debug log
-                handleSubmit(e);
-              }}
             >
               {loading ? "Recording..." : "Record Sale"}
             </Button>

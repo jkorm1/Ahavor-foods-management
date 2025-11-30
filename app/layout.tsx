@@ -19,7 +19,7 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "starpops",
   description: "starpops-management",
-  generator: "v0.app",
+  generator: "",
   icons: {
     icon: [
       {

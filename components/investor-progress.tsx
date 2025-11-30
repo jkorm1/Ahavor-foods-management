@@ -3,25 +3,49 @@ import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/contexts/auth-context";
 import { useState, useEffect } from "react";
 
-const TARGET_AMOUNT = 18000;
-const MONTHLY_TARGET = 2700;
+const INVESTOR_TARGET = 18000;
+const SALES_TARGET = 120000;
+const PIECE_TARGET = 12000;
 
 export default function InvestorProgress({
-  currentAmount,
+  salesData = [],
 }: {
-  currentAmount: number;
+  salesData?: Array<{
+    total: number;
+    quantity: number;
+  }>;
 }) {
   const { investorName } = useAuth();
   const [loading, setLoading] = useState(true);
-  const percentage = Math.min((currentAmount / TARGET_AMOUNT) * 100, 100);
-  const monthlyPercentage = Math.min(
-    (currentAmount / MONTHLY_TARGET) * 100,
+
+  // Calculate totals from sales data with safe defaults
+  const totals = (salesData || []).reduce(
+    (acc, sale) => ({
+      total: acc.total + (Number(sale?.total) || 0),
+      totalPieces: acc.totalPieces + (Number(sale?.quantity) || 0),
+      investorShare: acc.investorShare + (Number(sale?.investorShare) || 0),
+    }),
+    { total: 0, totalPieces: 0, investorShare: 0 }
+  );
+
+  const investorPercentage = Math.min(
+    (totals.investorShare / INVESTOR_TARGET) * 100,
     100
   );
+  const investorRemaining = Math.max(INVESTOR_TARGET - totals.investorShare, 0);
+
+  const salesPercentage = Math.min((totals.total / SALES_TARGET) * 100, 100);
+  const salesRemaining = Math.max(SALES_TARGET - totals.total, 0);
+
+  const piecesPercentage = Math.min(
+    (totals.totalPieces / PIECE_TARGET) * 100,
+    100
+  );
+  const piecesRemaining = Math.max(PIECE_TARGET - totals.totalPieces, 0);
 
   useEffect(() => {
     setLoading(false);
-  }, [currentAmount]);
+  }, [salesData]);
 
   return (
     <Card className="w-full">
@@ -40,38 +64,76 @@ export default function InvestorProgress({
           <div className="space-y-2">
             <div className="h-2 w-full bg-gray-200 rounded animate-pulse" />
             <div className="h-2 w-full bg-gray-200 rounded animate-pulse" />
+            <div className="h-2 w-full bg-gray-200 rounded animate-pulse" />
           </div>
         ) : (
           <>
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <span>Current Investment</span>
+                <span>Investment Target</span>
                 <span className="font-medium">
-                  GHS {currentAmount.toFixed(2)}
+                  GHS{" "}
+                  {totals.investorShare.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}{" "}
+                  / GHS{" "}
+                  {INVESTOR_TARGET.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
                 </span>
               </div>
-              <div className="flex justify-between text-sm">
-                <span>Target Amount</span>
-                <span className="font-medium">
-                  GHS {TARGET_AMOUNT.toFixed(2)}
-                </span>
-              </div>
-              <Progress value={percentage} className="w-full" />
+              <Progress value={investorPercentage} className="w-full" />
               <div className="text-sm text-muted-foreground">
-                {percentage.toFixed(1)}% of target reached
+                {investorPercentage.toFixed(1)}% - GHS{" "}
+                {investorRemaining.toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}{" "}
+                remaining
               </div>
             </div>
 
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <span>Monthly Target</span>
+                <span>Sales Target</span>
                 <span className="font-medium">
-                  GHS {MONTHLY_TARGET.toFixed(2)}
+                  GHS{" "}
+                  {totals.total.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}{" "}
+                  / GHS{" "}
+                  {SALES_TARGET.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
                 </span>
               </div>
-              <Progress value={monthlyPercentage} className="w-full" />
+              <Progress value={salesPercentage} className="w-full" />
               <div className="text-sm text-muted-foreground">
-                {monthlyPercentage.toFixed(1)}% of monthly target
+                {salesPercentage.toFixed(1)}% - GHS{" "}
+                {salesRemaining.toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}{" "}
+                remaining
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span>Pieces Target</span>
+                <span className="font-medium">
+                  {totals.totalPieces.toLocaleString()} /{" "}
+                  {PIECE_TARGET.toLocaleString()} pieces
+                </span>
+              </div>
+              <Progress value={piecesPercentage} className="w-full" />
+              <div className="text-sm text-muted-foreground">
+                {piecesPercentage.toFixed(1)}% -{" "}
+                {piecesRemaining.toLocaleString()} pieces remaining
               </div>
             </div>
           </>
