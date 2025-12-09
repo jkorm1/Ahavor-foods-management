@@ -34,9 +34,10 @@ const expenseCategories = [
   "Tissue",
   "Packaging",
   "Transport",
-  "Fuel or Prepaid",
+  "Electricity",
+  "Stand",
   "Utilities",
-  "Other",
+  "Others",
 ];
 
 const getCurrentDate = () => {

@@ -33,17 +33,26 @@ export function LossesTable() {
       const response = await fetch("/api/losses");
       if (response.ok) {
         const data = await response.json();
-        setLosses(data);
+        // Ensure data is an array before setting state
+        if (Array.isArray(data)) {
+          setLosses(data);
+        } else {
+          console.error("Invalid data format received:", data);
+          setLosses([]);
+        }
+      } else {
+        console.error("Failed to fetch losses:", response.statusText);
+        setLosses([]);
       }
     } catch (error) {
       console.error("Failed to fetch losses:", error);
+      setLosses([]);
     }
   };
 
-  const totalLosses = losses.reduce(
-    (sum, loss) => sum + loss.potentialValue,
-    0
-  );
+  const totalLosses = Array.isArray(losses)
+    ? losses.reduce((sum, loss) => sum + (loss.potentialValue || 0), 0)
+    : 0;
 
   return (
     <Card>

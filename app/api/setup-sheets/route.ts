@@ -35,10 +35,13 @@ export async function POST(request: NextRequest) {
           "Quantity",
           "Price",
           "Total Sales",
-          "Business Fund",
-          "Employee Share",
+          "Event",
+          "Production Cost",
           "Investor Share",
+          "Sales Payroll",
+          "Packaging Payroll",
           "Savings",
+          "Reinvestment",
         ],
       },
       { name: "Expenses", headers: ["ID", "Date", "Category", "Description", "Amount", "Notes"] },
@@ -62,32 +65,41 @@ export async function POST(request: NextRequest) {
       }
     ]
 
-    // Create or update sheets only if they don't exist
-    for (const config of sheetConfigs) {
-      if (!existingSheetNames.includes(config.name)) {
-        // Create new sheet
-        await sheets.spreadsheets.batchUpdate({
-          spreadsheetId: sheetId,
-          requestBody: {
-            requests: [{
-              addSheet: {
-                properties: { 
-                  title: config.name,
-                },
-              },
-            }],
+// Create or update sheets
+for (const config of sheetConfigs) {
+  if (!existingSheetNames.includes(config.name)) {
+    // Create new sheet
+    await sheets.spreadsheets.batchUpdate({
+      spreadsheetId: sheetId,
+      requestBody: {
+        requests: [{
+          addSheet: {
+            properties: { 
+              title: config.name,
+            },
           },
-        })
+        }],
+      },
+    })
 
-        // Add headers to the new sheet
-        await sheets.spreadsheets.values.update({
-          spreadsheetId: sheetId,
-          range: `${config.name}!A1`,
-          valueInputOption: "USER_ENTERED",
-          requestBody: { values: [config.headers] },
-        })
-      }
-    }
+    // Add headers to the new sheet
+    await sheets.spreadsheets.values.update({
+      spreadsheetId: sheetId,
+      range: `${config.name}!A1`,
+      valueInputOption: "USER_ENTERED",
+      requestBody: { values: [config.headers] },
+    })
+  } else {
+    // Update headers in existing sheet
+    await sheets.spreadsheets.values.update({
+      spreadsheetId: sheetId,
+      range: `${config.name}!A1`,
+      valueInputOption: "USER_ENTERED",
+      requestBody: { values: [config.headers] },
+    })
+  }
+}
+
 
     return NextResponse.json({
       success: true,

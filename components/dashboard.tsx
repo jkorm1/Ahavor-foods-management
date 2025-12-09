@@ -34,6 +34,16 @@ import { getSales, getExpenses } from "@/lib/transaction-store";
 import { useEffect, useState } from "react";
 import InvestorProgress from "./investor-progress";
 
+interface Sale {
+  productionCost?: number;
+  investorShare?: number;
+  salesPayroll?: number;
+  packagingPayroll?: number;
+  savings?: number;
+  reinvestment?: number;
+  [key: string]: any;
+}
+
 export default function Dashboard({ data, onRefresh }) {
   const { toast } = useToast();
   const [salesData, setSalesData] = useState([]);
@@ -59,6 +69,46 @@ export default function Dashboard({ data, onRefresh }) {
 
     fetchData();
   }, [toast]);
+
+  // Calculate employee shares from sales data
+  const employeeShares = salesData.reduce((acc, sale) => {
+    const employee = sale.employee;
+    const existing = acc.find((e) => e.employee === employee);
+    if (existing) {
+      existing.totalShare += (sale.total * 6.944) / 100; // Sales + Packaging payroll
+      existing.salesCount += 1;
+    } else {
+      acc.push({
+        employee,
+        totalShare: (sale.total * 6.944) / 100,
+        salesCount: 1,
+      });
+    }
+    return acc;
+  }, []);
+
+  <Card className="bg-card border-border">
+    <CardHeader>
+      <CardTitle className="text-base">Employee Shares</CardTitle>
+      <CardDescription>Share distribution by employee</CardDescription>
+    </CardHeader>
+    <CardContent>
+      <ResponsiveContainer width="100%" height={300}>
+        <BarChart data={employeeShares}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+          <XAxis dataKey="employee" stroke="#9ca3af" />
+          <YAxis stroke="#9ca3af" />
+          <Tooltip
+            contentStyle={{
+              backgroundColor: "#1f2937",
+              border: "1px solid #374151",
+            }}
+          />
+          <Bar dataKey="totalShare" fill="#06b6d4" name="Total Share (GHS)" />
+        </BarChart>
+      </ResponsiveContainer>
+    </CardContent>
+  </Card>;
 
   const handleExportSales = async () => {
     try {
@@ -155,31 +205,32 @@ export default function Dashboard({ data, onRefresh }) {
 
   // Calculate fund totals from sales data instead of using props
   const fundTotals = salesData.reduce(
-    (acc, sale) => {
-      acc.businessFund += sale.businessFund || 0;
-      acc.employeeShare += sale.employeeShare || 0;
-      acc.investorShare += sale.investorShare || 0;
-      acc.savings += sale.savings || 0;
+    (acc: Record<string, number>, sale: Sale) => {
+      const total = sale.total || 0;
+      // Always calculate from total, ignore stored values
+      acc.productionCost += (total * 63) / 100;
+      acc.investorShare += (total * 12) / 100; // Force recalculation
+      acc.salesPayroll += (total * 6.944) / 100;
+      acc.packagingPayroll += (total * 6.944) / 100;
+      acc.savings += (total * 5.556) / 100;
+      acc.reinvestment += (total * 5.556) / 100;
       return acc;
     },
     {
-      businessFund: 0,
-      employeeShare: 0,
+      productionCost: 0,
       investorShare: 0,
+      salesPayroll: 0,
+      packagingPayroll: 0,
       savings: 0,
+      reinvestment: 0,
     }
   );
 
   const fundData = [
     {
-      name: "Business Fund",
-      value: fundTotals.businessFund.toFixed(2),
+      name: "Production Cost",
+      value: fundTotals.productionCost.toFixed(2),
       fill: "#f59e0b",
-    },
-    {
-      name: "Employee Share",
-      value: fundTotals.employeeShare.toFixed(2),
-      fill: "#06b6d4",
     },
     {
       name: "Investor Share",
@@ -187,8 +238,23 @@ export default function Dashboard({ data, onRefresh }) {
       fill: "#8b5cf6",
     },
     {
+      name: "Sales Payroll",
+      value: fundTotals.salesPayroll.toFixed(2),
+      fill: "#06b6d4",
+    },
+    {
+      name: "Packaging Payroll",
+      value: fundTotals.packagingPayroll.toFixed(2),
+      fill: "#06b6d4",
+    },
+    {
       name: "Savings",
-      value: fundTotals.savings.toFixed(2), // Use calculated total
+      value: fundTotals.savings.toFixed(2),
+      fill: "#10b981",
+    },
+    {
+      name: "Reinvestment",
+      value: fundTotals.reinvestment.toFixed(2),
       fill: "#10b981",
     },
   ];
@@ -259,7 +325,6 @@ export default function Dashboard({ data, onRefresh }) {
             </ResponsiveContainer>
           </CardContent>
         </Card>
-
         {/* Employee Shares */}
         <Card className="bg-card border-border">
           <CardHeader>
@@ -268,7 +333,7 @@ export default function Dashboard({ data, onRefresh }) {
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={data?.employeeShares || []}>
+              <BarChart data={employeeShares}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                 <XAxis dataKey="employee" stroke="#9ca3af" />
                 <YAxis stroke="#9ca3af" />
@@ -287,7 +352,6 @@ export default function Dashboard({ data, onRefresh }) {
             </ResponsiveContainer>
           </CardContent>
         </Card>
-
         {/* Fund Distribution */}
         <Card className="bg-card border-border">
           <CardHeader>
@@ -318,9 +382,7 @@ export default function Dashboard({ data, onRefresh }) {
             </ResponsiveContainer>
           </CardContent>
         </Card>
-
         <InvestorProgress salesData={salesData} />
-
         {/* Expense Breakdown */}
         <Card className="bg-card border-border col-span-1 md:col-span-2">
           <CardHeader>

@@ -13,12 +13,17 @@ function saleToRow(sale: Sale): string[] {
     String(sale.quantity),
     String(sale.price),
     String(sale.total),
-    String(sale.businessFund),
-    String(sale.employeeShare),
+    sale.event || "Normal", 
+    String(sale.productionCost),
     String(sale.investorShare),
+    String(sale.salesPayroll),
+    String(sale.packagingPayroll),
     String(sale.savings),
+    String(sale.reinvestment),
   ]
 }
+
+
 function expenseToRow(expense: Expense): string[] {
   return [expense.id, expense.date, expense.category, expense.description, String(expense.amount)]
 }
@@ -36,12 +41,16 @@ function rowToSale(row: string[]): Sale {
     quantity: Number(row[4]),
     price: Number(row[5]),
     total: Number(row[6]),
-    businessFund: Number(row[7]),
-    employeeShare: Number(row[8]),
-    investorShare: Number(row[9]) || 0, // Add fallback for undefined
-    savings: Number(row[10]) || 0, 
+    event: row[7] || "Normal",
+    productionCost: Number(row[8]) || 0,
+    investorShare: Number(row[9]) || 0,
+    salesPayroll: Number(row[10]) || 0,
+    packagingPayroll: Number(row[11]) || 0,
+    savings: Number(row[12]) || 0,
+    reinvestment: Number(row[13]) || 0,
   }
 }
+
 
 function rowToExpense(row: string[]): Expense {
   return {
@@ -125,7 +134,7 @@ export async function addWithdrawal(withdrawal: Omit<Withdrawal, "id">): Promise
 
 export async function getSales(): Promise<Sale[]> {
   try {
-    const { values } = await makeRequest('read', 'Sales!A2:K')
+    const { values } = await makeRequest('read', 'Sales!A2:O')
     return values.map(rowToSale)
   } catch (error) {
     console.error("Failed to fetch sales:", error)

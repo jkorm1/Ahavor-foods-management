@@ -28,18 +28,31 @@ export default function Home() {
       const response = await fetch("/api/dashboard");
       const result = await response.json();
 
-      // Fetch losses separately
-      const lossesResponse = await fetch("/api/losses");
-      const losses = await lossesResponse.json();
-      const totalLosses = losses.reduce(
-        (sum, loss) => sum + loss.potentialValue,
-        0
-      );
+      // Fetch sales to get unique days
+      const salesResponse = await fetch("/api/sales");
+      const salesData = await salesResponse.json();
+      const uniqueDays = salesData.uniqueDays || 0;
 
-      setData(result);
+      // Fetch losses separately with error handling
+      const lossesResponse = await fetch("/api/losses");
+      let totalLosses = 0;
+      try {
+        const losses = await lossesResponse.json();
+        if (Array.isArray(losses)) {
+          totalLosses = losses.reduce(
+            (sum, loss) => sum + (loss.potentialValue || 0),
+            0
+          );
+        }
+      } catch (error) {
+        console.error("Error processing losses data:", error);
+      }
+
+      setData({ ...result, uniqueDays, totalLosses });
       setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
+      setLoading(false);
     }
   };
 
@@ -77,7 +90,7 @@ export default function Home() {
                   GHS {data.totalSales || 0}
                 </div>
                 <p className="text-xs text-green-500 mt-1">
-                  +12% from last month
+                  Sales made on {data.uniqueDays || 0} days
                 </p>
               </CardContent>
             </Card>

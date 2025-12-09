@@ -20,6 +20,10 @@ interface EmployeeMonthlyShare {
   salesCount: number;
 }
 
+interface ExtendedSale extends Sale {
+  salesPayroll?: number;
+}
+
 export default function EmployeeTable() {
   const [monthlyShares, setMonthlyShares] = useState<EmployeeMonthlyShare[]>(
     []
@@ -32,7 +36,7 @@ export default function EmployeeTable() {
         const sales = await getSales();
 
         // Group sales by employee and month
-        const sharesByEmployee = sales.reduce((acc, sale) => {
+        const sharesByEmployee = sales.reduce((acc, sale: ExtendedSale) => {
           const month = format(new Date(sale.date), "MMM yyyy");
           const key = `${sale.employee}-${month}`;
 
@@ -45,7 +49,7 @@ export default function EmployeeTable() {
             };
           }
 
-          acc[key].totalShare += sale.employeeShare;
+          acc[key].totalShare += sale.salesPayroll || 0;
           acc[key].salesCount += 1;
 
           return acc;

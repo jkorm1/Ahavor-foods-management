@@ -26,6 +26,8 @@ export default function SalesForm({ onSuccess }) {
     quantity: "",
     price: "",
     employee: employees[0],
+    event: "Normal",
+    eventName: "",
   });
 
   const handleChange = (e) => {
@@ -46,20 +48,20 @@ export default function SalesForm({ onSuccess }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Calculate values before submission
     const total = Number(formData.quantity) * Number(formData.price);
-    const businessFund = (total * 6) / 10;
-    const employeeShare = (total * 1.5) / 10;
-    const investorShare = (total * 1.5) / 10;
-    const savings = (total * 1) / 10;
+    const totalSales = Number(total.toFixed(2));
 
     const submissionData = {
       ...formData,
-      total: Math.round(total * 100) / 100,
-      businessFund: Math.round(businessFund * 100) / 100,
-      employeeShare: Math.round(employeeShare * 100) / 100,
-      investorShare: Math.round(investorShare * 100) / 100,
-      savings: Math.round(savings * 100) / 100,
+      event:
+        formData.event === "Normal" ? "Normal" : formData.eventName || "Normal",
+      total: totalSales,
+      productionCost: Number((totalSales * 0.63).toFixed(2)),
+      investorShare: Number((totalSales * 0.12).toFixed(2)),
+      salesPayroll: Number((totalSales * 0.06944).toFixed(2)),
+      packagingPayroll: Number((totalSales * 0.06944).toFixed(2)),
+      savings: Number((totalSales * 0.05556).toFixed(2)),
+      reinvestment: Number((totalSales * 0.05556).toFixed(2)),
     };
 
     setLoading(true);
@@ -83,6 +85,8 @@ export default function SalesForm({ onSuccess }) {
           quantity: "",
           price: "",
           employee: employees[0],
+          event: "Normal",
+          eventName: "",
         });
         setErrors({});
         onSuccess();
@@ -112,17 +116,23 @@ export default function SalesForm({ onSuccess }) {
         ).toFixed(2)
       : "0.00";
 
-  const businessFund = totalSales
-    ? ((Number(totalSales) * 6) / 10).toFixed(2)
-    : "0.00";
-  const employeeShare = totalSales
-    ? ((Number(totalSales) * 1.5) / 10).toFixed(2)
+  const productionCost = totalSales
+    ? ((Number(totalSales) * 63) / 100).toFixed(2)
     : "0.00";
   const investorShare = totalSales
-    ? ((Number(totalSales) * 1.5) / 10).toFixed(2)
+    ? ((Number(totalSales) * 12) / 100).toFixed(2)
+    : "0.00";
+  const salesPayroll = totalSales
+    ? ((Number(totalSales) * 6.944) / 100).toFixed(2)
+    : "0.00";
+  const packagingPayroll = totalSales
+    ? ((Number(totalSales) * 6.944) / 100).toFixed(2)
     : "0.00";
   const savings = totalSales
-    ? ((Number(totalSales) * 1) / 10).toFixed(2)
+    ? ((Number(totalSales) * 5.556) / 100).toFixed(2)
+    : "0.00";
+  const reinvestment = totalSales
+    ? ((Number(totalSales) * 5.556) / 100).toFixed(2)
     : "0.00";
 
   return (
@@ -217,6 +227,46 @@ export default function SalesForm({ onSuccess }) {
                 <p className="text-xs text-destructive">{errors.price}</p>
               )}
             </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="event">Event Type</Label>
+              <select
+                name="event"
+                value={formData.event}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setFormData((prev) => ({
+                    ...prev,
+                    event: value,
+                    eventName: value === "Normal" ? "" : prev.eventName,
+                  }));
+                }}
+                className="flex h-10 w-full rounded-md border border-border bg-input px-3 py-2 text-sm"
+              >
+                <option value="Normal">Normal Day Sales</option>
+                <option value="Event">Event Sales</option>
+              </select>
+            </div>
+            {formData.event === "Event" && (
+              <div className="space-y-2">
+                <Label htmlFor="eventName">Event Name</Label>
+                <Input
+                  id="eventName"
+                  name="eventName"
+                  type="text"
+                  value={formData.eventName || ""}
+                  onChange={(e) => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      eventName: e.target.value,
+                    }));
+                  }}
+                  className="bg-input border-border"
+                  placeholder="Enter event name"
+                />
+              </div>
+            )}
+
             <Button
               type="submit"
               disabled={loading}
@@ -243,32 +293,48 @@ export default function SalesForm({ onSuccess }) {
           <div className="space-y-3">
             <div className="flex justify-between items-center p-3 bg-muted/50 rounded border border-border">
               <span className="text-sm text-foreground">
-                Business Fund (6/10)
+                Production Cost (63%)
               </span>
               <span className="font-semibold text-accent">
-                GHS {businessFund}
+                GHS {productionCost}
               </span>
             </div>
             <div className="flex justify-between items-center p-3 bg-muted/50 rounded border border-border">
               <span className="text-sm text-foreground">
-                Employee Share (1.5/10)
-              </span>
-              <span className="font-semibold text-cyan-400">
-                GHS {employeeShare}
-              </span>
-            </div>
-            <div className="flex justify-between items-center p-3 bg-muted/50 rounded border border-border">
-              <span className="text-sm text-foreground">
-                Investor Share (1.5/10)
+                Investor Share (12%)
               </span>
               <span className="font-semibold text-purple-400">
                 GHS {investorShare}
               </span>
             </div>
             <div className="flex justify-between items-center p-3 bg-muted/50 rounded border border-border">
-              <span className="text-sm text-foreground">Savings (1/10)</span>
+              <span className="text-sm text-foreground">
+                Sales Payroll (6.944%)
+              </span>
+              <span className="font-semibold text-cyan-400">
+                GHS {salesPayroll}
+              </span>
+            </div>
+            <div className="flex justify-between items-center p-3 bg-muted/50 rounded border border-border">
+              <span className="text-sm text-foreground">
+                Packaging Payroll (6.944%)
+              </span>
+              <span className="font-semibold text-cyan-400">
+                GHS {packagingPayroll}
+              </span>
+            </div>
+            <div className="flex justify-between items-center p-3 bg-muted/50 rounded border border-border">
+              <span className="text-sm text-foreground">Savings (5.556%)</span>
               <span className="font-semibold text-green-400">
                 GHS {savings}
+              </span>
+            </div>
+            <div className="flex justify-between items-center p-3 bg-muted/50 rounded border border-border">
+              <span className="text-sm text-foreground">
+                Reinvestment (5.556%)
+              </span>
+              <span className="font-semibold text-green-400">
+                GHS {reinvestment}
               </span>
             </div>
           </div>

@@ -4,8 +4,8 @@ import { useAuth } from "@/contexts/auth-context";
 import { useState, useEffect } from "react";
 
 const INVESTOR_TARGET = 18000;
-const SALES_TARGET = 120000;
-const PIECE_TARGET = 12000;
+const SALES_TARGET = 151200;
+const PIECE_TARGET = 15120;
 
 export default function InvestorProgress({
   salesData = [],

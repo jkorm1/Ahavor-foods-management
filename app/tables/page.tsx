@@ -21,10 +21,12 @@ export default function TablesPage() {
     totalSales: 0,
     totalExpenses: 0,
     totalProfit: 0,
-    businessFund: 0,
+    productionCost: 0,
     investorShare: 0,
-    employeeShare: 0,
+    salesPayroll: 0,
+    packagingPayroll: 0,
     savings: 0,
+    reinvestment: 0,
     totalLosses: 0,
   });
 
@@ -38,19 +40,33 @@ export default function TablesPage() {
           0
         );
         const totalProfit = totalSales - totalExpenses;
-        const businessFund = sales.reduce(
-          (sum, sale) => sum + sale.businessFund,
+
+        // Always calculate from total, ignore stored values
+        const productionCost = sales.reduce(
+          (sum, sale) => sum + (sale.total * 63) / 100,
           0
         );
         const investorShare = sales.reduce(
-          (sum, sale) => sum + sale.investorShare,
+          (sum, sale) => sum + (sale.total * 12) / 100,
           0
         );
-        const employeeShare = sales.reduce(
-          (sum, sale) => sum + sale.employeeShare,
+        const salesPayroll = sales.reduce(
+          (sum, sale) => sum + (sale.total * 6.944) / 100,
           0
         );
-        const savings = sales.reduce((sum, sale) => sum + sale.savings, 0);
+        const packagingPayroll = sales.reduce(
+          (sum, sale) => sum + (sale.total * 6.944) / 100,
+          0
+        );
+        const savings = sales.reduce(
+          (sum, sale) => sum + (sale.total * 5.556) / 100,
+          0
+        );
+        const reinvestment = sales.reduce(
+          (sum, sale) => sum + (sale.total * 5.556) / 100,
+          0
+        );
+
         // Fetch losses
         const lossesResponse = await fetch("/api/losses");
         const losses = await lossesResponse.json();
@@ -63,16 +79,19 @@ export default function TablesPage() {
           totalSales,
           totalExpenses,
           totalProfit,
-          businessFund,
+          productionCost,
           investorShare,
-          employeeShare,
+          salesPayroll,
+          packagingPayroll,
           savings,
+          reinvestment,
           totalLosses,
         });
       } catch (error) {
         console.error("Failed to load summary:", error);
       }
     };
+
     loadSummary();
   }, []);
 
@@ -88,7 +107,7 @@ export default function TablesPage() {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-8 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-9 gap-4">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Total Sales</CardTitle>
@@ -129,13 +148,15 @@ export default function TablesPage() {
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Business Fund</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Production Cost
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-accent">
-              GHS {summary.businessFund || 0}
+              GHS {summary.productionCost.toFixed(2)}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">6 GHS per sale</p>
+            <p className="text-xs text-muted-foreground mt-1">63% per sale</p>
           </CardContent>
         </Card>
         <Card>
@@ -148,18 +169,35 @@ export default function TablesPage() {
             <div className="text-2xl font-bold">
               GHS {summary.investorShare.toFixed(2)}
             </div>
+            <p className="text-xs text-muted-foreground mt-1">12% per sale</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">Sales Payroll</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              GHS {summary.salesPayroll.toFixed(2)}
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              6.944% per sale
+            </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">
-              Employee Share
+              Packaging Payroll
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              GHS {summary.employeeShare.toFixed(2)}
+              GHS {summary.packagingPayroll.toFixed(2)}
             </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              6.944% per sale
+            </p>
           </CardContent>
         </Card>
         <Card>
@@ -170,16 +208,22 @@ export default function TablesPage() {
             <div className="text-2xl font-bold">
               GHS {summary.savings.toFixed(2)}
             </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              5.556% per sale
+            </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Total Losses</CardTitle>
+            <CardTitle className="text-sm font-medium">Reinvestment</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">
-              GHS {summary.totalLosses.toFixed(2)}
+            <div className="text-2xl font-bold">
+              GHS {summary.reinvestment.toFixed(2)}
             </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              5.556% per sale
+            </p>
           </CardContent>
         </Card>
       </div>
