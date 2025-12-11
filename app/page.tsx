@@ -62,7 +62,7 @@ export default function Home() {
       <div className="border-b border-border bg-card">
         <div className="mx-auto max-w-7xl px-4 py-6">
           <h1 className="text-3xl font-bold text-foreground">
-            Star Pops Financial Dashboard
+            Ahavor Foods Financial Dashboard
             {investorName && (
               <span className="ml-2 text-sm text-muted-foreground">
                 (Welcome, {investorName})
@@ -137,26 +137,28 @@ export default function Home() {
 
         {/* Main Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-6 bg-muted border border-border">
-            <TabsTrigger value="dashboard" className="text-xs md:text-sm">
-              Dashboard
-            </TabsTrigger>
-            <TabsTrigger value="sales" className="text-xs md:text-sm">
-              Sales
-            </TabsTrigger>
-            <TabsTrigger value="expenses" className="text-xs md:text-sm">
-              Expenses
-            </TabsTrigger>
-            <TabsTrigger value="losses" className="text-xs md:text-sm">
-              Losses
-            </TabsTrigger>
-            <TabsTrigger value="withdrawals" className="text-xs md:text-sm">
-              Withdrawals
-            </TabsTrigger>
-            <TabsTrigger value="statements" className="text-xs md:text-sm">
-              Statements
-            </TabsTrigger>
-          </TabsList>
+          <div className="bg-muted border border-border rounded-lg p-1 mb-4">
+            <TabsList className="grid w-full grid-cols-3 md:grid-cols-6 bg-transparent border-0 bg-muted border border-border gap-1 auto-rows-min pd-3 mb-4">
+              <TabsTrigger value="dashboard" className="text-xs md:text-sm">
+                Dashboard
+              </TabsTrigger>
+              <TabsTrigger value="sales" className="text-xs md:text-sm">
+                Sales
+              </TabsTrigger>
+              <TabsTrigger value="expenses" className="text-xs md:text-sm">
+                Expenses
+              </TabsTrigger>
+              <TabsTrigger value="losses" className="text-xs md:text-sm">
+                Losses
+              </TabsTrigger>
+              <TabsTrigger value="withdrawals" className="text-xs md:text-sm">
+                Withdrawals
+              </TabsTrigger>
+              <TabsTrigger value="statements" className="text-xs md:text-sm">
+                Statements
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="dashboard" className="mt-6">
             <Dashboard data={data} onRefresh={fetchData} />

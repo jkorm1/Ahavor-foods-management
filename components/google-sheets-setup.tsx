@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 
 export function GoogleSheetsSetup() {
   const [sheetId, setSheetId] = useState(
-    "1jxnOIYWWLz2GfGNmdntxHr30UD6o94cWZP2X73hFalw"
+    "1zXRoLHIzSVLTIOcwLXXK2EUqzaAsyFLeOP4ZxB58foo"
   );
 
   const credentials = {

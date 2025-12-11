@@ -14,7 +14,12 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { validateSale } from "@/lib/validation";
 
-const employees = ["Joseph Korm", "Alvin", "Peter", "Sarah"];
+const employees = [
+  "Christian Frimpong",
+  "Joseph Korm",
+  "Kofi Adu Jnr",
+  "Taufik Yussif",
+];
 
 export default function SalesForm({ onSuccess }) {
   const { toast } = useToast();
@@ -22,7 +27,7 @@ export default function SalesForm({ onSuccess }) {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split("T")[0],
-    product: "Classic Popcorn",
+    product: "Ahavor Tombrown",
     quantity: "",
     price: "",
     employee: employees[0],

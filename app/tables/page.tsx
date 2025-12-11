@@ -229,23 +229,40 @@ export default function TablesPage() {
       </div>
 
       <Tabs defaultValue="sales" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="sales" className="flex items-center gap-2">
-            Sales Records
-          </TabsTrigger>
-          <TabsTrigger value="expenses" className="flex items-center gap-2">
-            Expenses
-          </TabsTrigger>
-          <TabsTrigger value="losses" className="flex items-center gap-2">
-            Inventory Losses
-          </TabsTrigger>
-          <TabsTrigger value="employees" className="flex items-center gap-2">
-            Employee Shares
-          </TabsTrigger>
-          <TabsTrigger value="investors" className="flex items-center gap-2">
-            Investor Returns
-          </TabsTrigger>
-        </TabsList>
+        <div className="bg-muted border border-border rounded-lg p-1 mb-4">
+          <TabsList className="grid w-full grid-cols-3 md:grid-cols-6 bg-muted border border-border auto-rows-min pd-3 mb-4">
+            <TabsTrigger
+              value="sales"
+              className="flex items-center gap-2 text-xs md:text-sm"
+            >
+              Sales Records
+            </TabsTrigger>
+            <TabsTrigger
+              value="expenses"
+              className="flex items-center gap-2 text-xs md:text-sm"
+            >
+              Expenses
+            </TabsTrigger>
+            <TabsTrigger
+              value="losses"
+              className="flex items-center gap-2 text-xs md:text-sm"
+            >
+              Inventory Losses
+            </TabsTrigger>
+            <TabsTrigger
+              value="employees"
+              className="flex items-center gap-2 text-xs md:text-sm"
+            >
+              Employee Shares
+            </TabsTrigger>
+            <TabsTrigger
+              value="investors"
+              className="flex items-center gap-2 text-xs md:text-sm"
+            >
+              Investor Returns
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
         <TabsContent value="sales" className="space-y-4">
           <Card>

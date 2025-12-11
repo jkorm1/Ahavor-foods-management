@@ -25,16 +25,8 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 // Define your investors and their passwords
 const INVESTORS: Investor[] = [
   {
-    name: "Joseph Korm",
+    name: "Christian Frimpong",
     password: process.env.NEXT_PUBLIC_INVESTOR_1_PASSWORD || "",
-  },
-  {
-    name: "Saint Abraham",
-    password: process.env.NEXT_PUBLIC_INVESTOR_2_PASSWORD || "",
-  },
-  {
-    name: "Preston Pesiba Amnankwa",
-    password: process.env.NEXT_PUBLIC_INVESTOR_3_PASSWORD || "",
   },
 ];
 

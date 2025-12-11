@@ -24,12 +24,11 @@ interface ExpenseItem {
 }
 
 const expenseCategories = [
-  "Maize",
-  "Sugar",
-  "Oil",
+  "Flour",
   "Milk",
+  "Soya",
+  "Package",
   "Flavour",
-  "Butter",
   "Cups",
   "Tissue",
   "Packaging",

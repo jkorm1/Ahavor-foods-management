@@ -54,11 +54,13 @@ export function InvestorLogin() {
           <div className="flex flex-col items-center space-y-2">
             <div className="relative">
               <div className="absolute" />
-              <img
-                src="/logo.png"
-                alt="StarPops Logo"
-                className="relative h-40 w-40"
-              />
+              <div className="relative h-40 w-40 rounded-full overflow-hidden bg-white shadow-lg">
+                <img
+                  src="/logo.png"
+                  alt="Ahavor Logo"
+                  className="w-full h-full object-cover"
+                />
+              </div>
             </div>
             <CardTitle className="text-3xl font-bold text-center bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
               Investor Access
@@ -124,7 +126,7 @@ export function InvestorLogin() {
           {/* Footer decoration */}
           <div className="flex items-center justify-center space-x-2 text-xs text-muted-foreground pt-4 border-t border-border/50">
             <div className="h-px bg-border flex-1" />
-            <span>StarPops Management</span>
+            <span>Ahavor Management</span>
             <div className="h-px bg-border flex-1" />
           </div>
         </CardContent>

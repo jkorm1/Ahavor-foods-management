@@ -17,8 +17,8 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "starpops",
-  description: "starpops-management",
+  title: "Ahavor",
+  description: "ahavor-management",
   generator: "",
   icons: {
     icon: [
