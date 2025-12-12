@@ -147,7 +147,7 @@ export default function ExpensesForm({ onSuccess }) {
         {
           id: "1",
           date: getCurrentDate(),
-          category: "Maize",
+          category: "Flour",
           description: "",
           amount: "",
         },
