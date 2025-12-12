@@ -70,7 +70,7 @@ export default function Home() {
             )}
           </h1>
           <p className="text-muted-foreground mt-2">
-            Manage your popcorn business finances in real-time
+            A great way to start your day!
           </p>
         </div>
       </div>
