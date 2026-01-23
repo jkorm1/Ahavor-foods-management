@@ -1,26 +1,8 @@
 import { google } from "googleapis"
 import { JWT } from "google-auth-library"
-import { calculateSaleSplit } from "@/lib/financial-logic"
-import { addSale } from "@/lib/transaction-store"
-
-interface SaleData {
-  date: string;
-  employee: string;
-  product: string;
-  quantity: string | number;
-  price: string | number;
-  productionCost: number;
-  investorShare: number;
-  salesPayroll: number;
-  packagingPayroll: number;
-  savings: number;
-  reinvestment: number;
-  event: string; // Changed from eventType to event
-}
 
 export async function POST(request: Request) {
   try {
-
     const data = await request.json()
     const credentials = JSON.parse(process.env.GOOGLE_SHEETS_CREDENTIALS!)
     const auth = new JWT({
@@ -29,63 +11,88 @@ export async function POST(request: Request) {
       scopes: ["https://www.googleapis.com/auth/spreadsheets"],
     })
     const sheets = google.sheets({ version: "v4", auth })
-   
-    
+
     // Validate required fields
     if (!data.date || !data.employee || !data.product || !data.quantity || !data.price) {
       return Response.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    // Validate numeric fields
-    const numericFields = ['productionCost', 'investorShare', 'salesPayroll', 'packagingPayroll', 'savings', 'reinvestment'];
-    for (const field of numericFields) {
-      const value = Number(data[field]);
-      if (isNaN(value) || value < 0) {
-        return Response.json({ 
-          error: `Invalid ${field}: ${data[field]}` 
-        }, { status: 400 });
-      }
-      data[field] = value;
-    }
-
     const total = Number(data.quantity) * Number(data.price);
+    const id = Date.now().toString();
     
-    // Validate total
-    if (isNaN(total) || total <= 0) {
-      return Response.json({ error: "Invalid total amount" }, { status: 400 });
-    }
+    const row = [
+      id,
+      data.date,
+      data.employee,
+      data.product,
+      data.quantity,
+      data.price,
+      total,
+      data.event || "Normal",
+      data.productionCost,
+      data.investorShare,
+      data.salesPayroll,
+      data.packagingPayroll,
+      data.savings,
+      data.reinvestment
+    ];
 
-    const sale = await addSale({
-      date: data.date,
-      employee: data.employee,
-      product: data.product,
-      quantity: Number(data.quantity),
-      price: Number(data.price),
-      total: Math.round(total * 100) / 100,
-      productionCost: Math.round((total * 0.63) * 100) / 100,
-      investorShare: Math.round((total * 0.12) * 100) / 100,
-      salesPayroll: Math.round((total * 0.06944) * 100) / 100,
-      packagingPayroll: Math.round((total * 0.06944) * 100) / 100,
-      savings: Math.round((total * 0.05556) * 100) / 100,
-      reinvestment: Math.round((total * 0.05556) * 100) / 100,
-      event: data.event, // Now using single event field
+    await sheets.spreadsheets.values.append({
+      spreadsheetId: process.env.NEXT_PUBLIC_GOOGLE_SHEET_ID,
+      range: "Sales!A:N",
+      valueInputOption: "USER_ENTERED",
+      insertDataOption: "INSERT_ROWS",
+      requestBody: { values: [row] }
     });
 
-    return Response.json({ success: true, data: sale });
+    return Response.json({ 
+      success: true, 
+      data: { 
+        id,
+        ...data,
+        total
+      }
+    });
   } catch (error) {
     console.error("Sales API error:", error);
     return Response.json({ error: "Failed to record sale" }, { status: 500 });
   }
 }
 
-
 export async function GET() {
   try {
-    const { getSales } = await import("@/lib/transaction-store")
-    const sales = await getSales()
+    const credentials = JSON.parse(process.env.GOOGLE_SHEETS_CREDENTIALS!)
+    const auth = new JWT({
+      email: credentials.client_email,
+      key: credentials.private_key,
+      scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+    })
+    const sheets = google.sheets({ version: "v4", auth })
 
-     // Calculate unique days with sales
-     const uniqueDays = new Set(sales.map(sale => sale.date)).size;
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId: process.env.NEXT_PUBLIC_GOOGLE_SHEET_ID,
+      range: "Sales!A:N"
+    })
+
+    const rows = response.data.values || []
+    const sales = rows.slice(1).map((row) => ({
+      id: row[0],
+      date: row[1],
+      employee: row[2],
+      product: row[3],
+      quantity: Number(row[4]),
+      price: Number(row[5]),
+      total: Number(row[6]),
+      event: row[7],
+      productionCost: Number(row[8]),
+      investorShare: Number(row[9]),
+      salesPayroll: Number(row[10]),
+      packagingPayroll: Number(row[11]),
+      savings: Number(row[12]),
+      reinvestment: Number(row[13])
+    }))
+
+    const uniqueDays = new Set(sales.map(sale => sale.date)).size;
 
     return Response.json({ 
       sales,
