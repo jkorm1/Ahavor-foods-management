@@ -1,3 +1,5 @@
+import { google } from "googleapis"
+import { JWT } from "google-auth-library"
 import { calculateSaleSplit } from "@/lib/financial-logic"
 import { addSale } from "@/lib/transaction-store"
 
@@ -18,7 +20,16 @@ interface SaleData {
 
 export async function POST(request: Request) {
   try {
-    const data: SaleData = await request.json();
+
+    const data = await request.json()
+    const credentials = JSON.parse(process.env.GOOGLE_SHEETS_CREDENTIALS!)
+    const auth = new JWT({
+      email: credentials.client_email,
+      key: credentials.private_key,
+      scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+    })
+    const sheets = google.sheets({ version: "v4", auth })
+   
     
     // Validate required fields
     if (!data.date || !data.employee || !data.product || !data.quantity || !data.price) {
