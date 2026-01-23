@@ -86,7 +86,7 @@ export default function SalesForm({ onSuccess }) {
         });
         setFormData({
           date: new Date().toISOString().split("T")[0],
-          product: "Classic Popcorn",
+          product: "Ahavor Tombrown",
           quantity: "",
           price: "",
           employee: employees[0],

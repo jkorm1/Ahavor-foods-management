@@ -35,6 +35,7 @@ export async function POST(request: NextRequest) {
           range,
           valueInputOption: 'USER_ENTERED',
           requestBody: { values },
+          insertDataOption: 'INSERT_ROWS',
         })
         return NextResponse.json(appendResponse.data)
 

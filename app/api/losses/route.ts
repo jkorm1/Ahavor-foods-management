@@ -27,6 +27,7 @@ export async function POST(request: Request) {
       spreadsheetId: process.env.NEXT_PUBLIC_GOOGLE_SHEET_ID,
       range: "Losses!A:G",
       valueInputOption: "USER_ENTERED",
+      insertDataOption: "INSERT_ROWS",
       requestBody: { values: [row] }
     })
 

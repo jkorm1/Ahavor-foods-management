@@ -7,7 +7,7 @@ function generateId(): string {
 function saleToRow(sale: Sale): string[] {
   return [
     sale.id,
-    sale.date,
+    `'${sale.date}`,
     sale.employee,
     sale.product,
     String(sale.quantity),

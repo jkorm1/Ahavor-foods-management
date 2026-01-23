@@ -33,11 +33,13 @@ export default function ExpensesTable() {
     loadExpenses();
   }, []);
 
-  const filteredExpenses = expenses.filter((expense) =>
-    Object.values(expense).some((value) =>
-      value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredExpenses = expenses
+    .filter((expense) =>
+      Object.values(expense).some((value) =>
+        value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+      )
     )
-  );
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   if (loading) {
     return <div className="text-center p-4">Loading expenses data...</div>;
