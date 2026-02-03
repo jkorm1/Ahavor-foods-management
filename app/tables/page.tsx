@@ -14,7 +14,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { getAllTransactions } from "@/lib/transaction-store";
 
 export default function TablesPage() {
   const [summary, setSummary] = useState({
@@ -29,66 +28,60 @@ export default function TablesPage() {
     reinvestment: 0,
     totalLosses: 0,
   });
+  const [loading, setLoading] = useState(true);
 
+  // In app/tables/page.tsx
+  // In app/tables/page.tsx
   useEffect(() => {
     const loadSummary = async () => {
       try {
-        const { sales, expenses } = await getAllTransactions();
-        const totalSales = sales.reduce((sum, sale) => sum + sale.total, 0);
-        const totalExpenses = expenses.reduce(
-          (sum, exp) => sum + exp.amount,
-          0
-        );
-        const totalProfit = totalSales - totalExpenses;
+        setLoading(true);
+        const response = await fetch("/api/dashboard");
+        const result = await response.json();
 
-        // Always calculate from total, ignore stored values
-        const productionCost = sales.reduce(
-          (sum, sale) => sum + (sale.total * 63) / 100,
-          0
-        );
-        const investorShare = sales.reduce(
-          (sum, sale) => sum + (sale.total * 12) / 100,
-          0
-        );
-        const salesPayroll = sales.reduce(
-          (sum, sale) => sum + (sale.total * 6.944) / 100,
-          0
-        );
-        const packagingPayroll = sales.reduce(
-          (sum, sale) => sum + (sale.total * 6.944) / 100,
-          0
-        );
-        const savings = sales.reduce(
-          (sum, sale) => sum + (sale.total * 5.556) / 100,
-          0
-        );
-        const reinvestment = sales.reduce(
-          (sum, sale) => sum + (sale.total * 5.556) / 100,
-          0
-        );
+        if (!response.ok) {
+          throw new Error(result.error || "Failed to fetch data");
+        }
 
-        // Fetch losses
-        const lossesResponse = await fetch("/api/losses");
-        const losses = await lossesResponse.json();
-        const totalLosses = losses.reduce(
-          (sum, loss) => sum + loss.potentialValue,
-          0
-        );
+        // Calculate unique days from sales data
+        const uniqueDays = new Set(result.sales?.map((sale) => sale.date) || [])
+          .size;
+
+        // Calculate total losses from losses data
+        const totalLosses =
+          result.losses?.reduce(
+            (sum, loss) => sum + (Number(loss.potentialValue) || 0),
+            0,
+          ) || 0;
 
         setSummary({
-          totalSales,
-          totalExpenses,
-          totalProfit,
-          productionCost,
-          investorShare,
-          salesPayroll,
-          packagingPayroll,
-          savings,
-          reinvestment,
+          totalSales: result.totalSales || 0,
+          totalExpenses: result.totalExpenses || 0,
+          totalProfit: result.netProfit || 0,
+          productionCost: result.totalSales * 0.63 || 0,
+          investorShare: result.totalSales * 0.12 || 0,
+          salesPayroll: result.totalSales * 0.06944 || 0,
+          packagingPayroll: result.totalSales * 0.06944 || 0,
+          savings: result.totalSales * 0.05556 || 0,
+          reinvestment: result.totalSales * 0.05556 || 0,
           totalLosses,
         });
       } catch (error) {
         console.error("Failed to load summary:", error);
+        setSummary({
+          totalSales: 0,
+          totalExpenses: 0,
+          totalProfit: 0,
+          productionCost: 0,
+          investorShare: 0,
+          salesPayroll: 0,
+          packagingPayroll: 0,
+          savings: 0,
+          reinvestment: 0,
+          totalLosses: 0,
+        });
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -107,126 +100,146 @@ export default function TablesPage() {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-9 gap-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Total Sales</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              GHS {summary.totalSales.toFixed(2)}
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total Expenses
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              GHS {summary.totalExpenses.toFixed(2)}
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">
-              Current Profit
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div
-              className={`text-2xl font-bold ${
-                summary.totalProfit >= 0 ? "text-green-600" : "text-red-600"
-              }`}
-            >
-              GHS {summary.totalProfit.toFixed(2)}
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">
-              Production Cost
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-accent">
-              GHS {summary.productionCost.toFixed(2)}
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">63% per sale</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">
-              Investor Share
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              GHS {summary.investorShare.toFixed(2)}
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">12% per sale</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Sales Payroll</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              GHS {summary.salesPayroll.toFixed(2)}
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              6.944% per sale
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">
-              Packaging Payroll
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              GHS {summary.packagingPayroll.toFixed(2)}
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              6.944% per sale
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Savings</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              GHS {summary.savings.toFixed(2)}
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              5.556% per sale
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Reinvestment</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              GHS {summary.reinvestment.toFixed(2)}
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              5.556% per sale
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Summary Cards */}
+      {loading ? (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-9 gap-4">
+          {[...Array(9)].map((_, i) => (
+            <Card key={i} className="animate-pulse">
+              <CardHeader className="pb-2">
+                <div className="h-4 bg-gray-200 rounded w-20"></div>
+              </CardHeader>
+              <CardContent>
+                <div className="h-8 bg-gray-200 rounded w-24"></div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-9 gap-4">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium">Total Sales</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                GHS {summary.totalSales.toFixed(2)}
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium">
+                Total Expenses
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                GHS {summary.totalExpenses.toFixed(2)}
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium">
+                Current Profit
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div
+                className={`text-2xl font-bold ${
+                  summary.totalProfit >= 0 ? "text-green-600" : "text-red-600"
+                }`}
+              >
+                GHS {summary.totalProfit.toFixed(2)}
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium">
+                Production Cost
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-accent">
+                GHS {summary.productionCost.toFixed(2)}
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">63% per sale</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium">
+                Investor Share
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                GHS {summary.investorShare.toFixed(2)}
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">12% per sale</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium">
+                Sales Payroll
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                GHS {summary.salesPayroll.toFixed(2)}
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                6.944% per sale
+              </p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium">
+                Packaging Payroll
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                GHS {summary.packagingPayroll.toFixed(2)}
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                6.944% per sale
+              </p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium">Savings</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                GHS {summary.savings.toFixed(2)}
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                5.556% per sale
+              </p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium">
+                Reinvestment
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                GHS {summary.reinvestment.toFixed(2)}
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                5.556% per sale
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       <Tabs defaultValue="sales" className="space-y-4">
         <div className="bg-muted border border-border rounded-lg p-1 mb-4">

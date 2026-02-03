@@ -48,8 +48,8 @@ export default function SalesTable() {
   const filteredAndSortedSales = sales
     .filter((sale) =>
       Object.values(sale).some((value) =>
-        value.toString().toLowerCase().includes(searchTerm.toLowerCase())
-      )
+        value.toString().toLowerCase().includes(searchTerm.toLowerCase()),
+      ),
     )
     .sort((a, b) => {
       const aValue = a[sortField];

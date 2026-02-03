@@ -223,7 +223,7 @@ export default function Dashboard({ data, onRefresh }) {
       packagingPayroll: 0,
       savings: 0,
       reinvestment: 0,
-    }
+    },
   );
 
   const fundData = [

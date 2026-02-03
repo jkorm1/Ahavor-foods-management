@@ -41,7 +41,7 @@ export default function Home() {
         if (Array.isArray(losses)) {
           totalLosses = losses.reduce(
             (sum, loss) => sum + (loss.potentialValue || 0),
-            0
+            0,
           );
         }
       } catch (error) {
