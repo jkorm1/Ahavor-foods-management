@@ -15,6 +15,8 @@ import {
 } from "@/components/ui/table";
 import { format } from "date-fns";
 
+// In components/sales-table.tsx
+// In components/sales-table.tsx
 export default function SalesTable() {
   const [sales, setSales] = useState<Sale[]>([]);
   const [loading, setLoading] = useState(true);
@@ -23,18 +25,52 @@ export default function SalesTable() {
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
 
   useEffect(() => {
-    const loadSales = async () => {
+    const fetchSalesData = async () => {
       try {
-        const salesData = await getSales();
-        setSales(salesData);
+        setLoading(true);
+        const response = await fetch("/api/sales");
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.error || "Failed to fetch sales");
+        }
+
+        // Ensure result is an array
+        const salesData = Array.isArray(result) ? result : result.sales || [];
+
+        // Process the sales data
+        const processedSales = salesData.map((sale: any) => ({
+          id: sale.id || "",
+          date: sale.date || "",
+          employee: sale.employee || "",
+          product: sale.product || "",
+          quantity: Number(sale.quantity) || 0,
+          price: Number(sale.price) || 0,
+          total: Number(sale.total) || 0,
+          event: sale.event || "",
+          productionCost: Number(sale.productionCost) || 0,
+          investorShare: Number(sale.investorShare) || 0,
+          salesPayroll: Number(sale.salesPayroll) || 0,
+          packagingPayroll: Number(sale.packagingPayroll) || 0,
+          savings: Number(sale.savings) || 0,
+          reinvestment: Number(sale.reinvestment) || 0,
+        }));
+
+        setSales(processedSales);
       } catch (error) {
-        console.error("Failed to load sales:", error);
+        console.error("Error fetching sales:", error);
+        setSales([]);
       } finally {
         setLoading(false);
       }
     };
-    loadSales();
+
+    fetchSalesData();
   }, []);
+
+  // Rest of the component remains the same...
+
+  // Rest of the component remains the same...
 
   const handleSort = (field: keyof Sale) => {
     if (field === sortField) {
