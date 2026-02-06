@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Sale } from "@/lib/financial-logic";
-import { getSales } from "@/lib/transaction-store";
 import {
   Table,
   TableBody,
@@ -28,7 +26,14 @@ export default function InvestorTable() {
   useEffect(() => {
     const loadInvestorShares = async () => {
       try {
-        const sales = await getSales();
+        const response = await fetch("/api/sales");
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.error || "Failed to fetch sales");
+        }
+
+        const sales = Array.isArray(result) ? result : result.sales || [];
 
         // Group sales by month
         const sharesByMonth = sales.reduce(
@@ -43,7 +48,7 @@ export default function InvestorTable() {
               };
             }
 
-            acc[month].totalShare += sale.investorShare;
+            acc[month].totalShare += Number(sale.investorShare) || 0;
             acc[month].salesCount += 1;
 
             return acc;

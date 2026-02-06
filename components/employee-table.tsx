@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Sale } from "@/lib/financial-logic";
-import { getSales } from "@/lib/transaction-store";
 import {
   Table,
   TableBody,
@@ -20,10 +18,6 @@ interface EmployeeMonthlyShare {
   salesCount: number;
 }
 
-interface ExtendedSale extends Sale {
-  salesPayroll?: number;
-}
-
 export default function EmployeeTable() {
   const [monthlyShares, setMonthlyShares] = useState<EmployeeMonthlyShare[]>(
     [],
@@ -33,11 +27,18 @@ export default function EmployeeTable() {
   useEffect(() => {
     const loadEmployeeShares = async () => {
       try {
-        const sales = await getSales();
+        const response = await fetch("/api/sales");
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.error || "Failed to fetch sales");
+        }
+
+        const sales = Array.isArray(result) ? result : result.sales || [];
 
         // Group sales by employee and month
         const sharesByEmployee = sales.reduce(
-          (acc, sale: ExtendedSale) => {
+          (acc, sale) => {
             const month = format(new Date(sale.date), "MMM yyyy");
             const key = `${sale.employee}-${month}`;
 
@@ -50,7 +51,7 @@ export default function EmployeeTable() {
               };
             }
 
-            acc[key].totalShare += sale.salesPayroll || 0;
+            acc[key].totalShare += Number(sale.salesPayroll) || 0;
             acc[key].salesCount += 1;
 
             return acc;
