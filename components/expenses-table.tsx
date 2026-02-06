@@ -14,32 +14,44 @@ import {
 } from "@/components/ui/table";
 import { format } from "date-fns";
 
+// In components/expenses-table.tsx
+// In components/expenses-table.tsx
+// In components/expenses-table.tsx
 export default function ExpensesTable() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    const loadExpenses = async () => {
+    const fetchExpenses = async () => {
       try {
-        const expensesData = await getExpenses();
+        setLoading(true);
+        const response = await fetch("/api/expenses");
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch expenses");
+        }
+
+        // Ensure result is an array
+        const expensesData = Array.isArray(result) ? result : [];
         setExpenses(expensesData);
       } catch (error) {
-        console.error("Failed to load expenses:", error);
+        console.error("Failed to fetch expenses:", error);
+        setExpenses([]);
       } finally {
         setLoading(false);
       }
     };
-    loadExpenses();
+    fetchExpenses();
   }, []);
 
-  const filteredExpenses = expenses
-    .filter((expense) =>
-      Object.values(expense).some((value) =>
-        value.toString().toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    )
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  // Add filtered expenses logic
+  const filteredExpenses = expenses.filter((expense) =>
+    Object.values(expense).some((value) =>
+      value.toString().toLowerCase().includes(searchTerm.toLowerCase()),
+    ),
+  );
 
   if (loading) {
     return <div className="text-center p-4">Loading expenses data...</div>;

@@ -12,17 +12,19 @@ export async function POST(request: Request) {
     })
     const sheets = google.sheets({ version: "v4", auth })
 
-    // Validate required fields
-    if (!data.date || !data.employee || !data.product || !data.quantity || !data.price) {
-      return Response.json({ error: "Missing required fields" }, { status: 400 });
-    }
+   
+  const dateValue = new Date(data.date).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    });
 
     const total = Number(data.quantity) * Number(data.price);
     const id = Date.now().toString();
     
     const row = [
       id,
-      data.date,
+      dateValue,
       data.employee,
       data.product,
       data.quantity,

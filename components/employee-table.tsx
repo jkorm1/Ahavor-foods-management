@@ -26,7 +26,7 @@ interface ExtendedSale extends Sale {
 
 export default function EmployeeTable() {
   const [monthlyShares, setMonthlyShares] = useState<EmployeeMonthlyShare[]>(
-    []
+    [],
   );
   const [loading, setLoading] = useState(true);
 
@@ -36,24 +36,27 @@ export default function EmployeeTable() {
         const sales = await getSales();
 
         // Group sales by employee and month
-        const sharesByEmployee = sales.reduce((acc, sale: ExtendedSale) => {
-          const month = format(new Date(sale.date), "MMM yyyy");
-          const key = `${sale.employee}-${month}`;
+        const sharesByEmployee = sales.reduce(
+          (acc, sale: ExtendedSale) => {
+            const month = format(new Date(sale.date), "MMM yyyy");
+            const key = `${sale.employee}-${month}`;
 
-          if (!acc[key]) {
-            acc[key] = {
-              employee: sale.employee,
-              month,
-              totalShare: 0,
-              salesCount: 0,
-            };
-          }
+            if (!acc[key]) {
+              acc[key] = {
+                employee: sale.employee,
+                month,
+                totalShare: 0,
+                salesCount: 0,
+              };
+            }
 
-          acc[key].totalShare += sale.salesPayroll || 0;
-          acc[key].salesCount += 1;
+            acc[key].totalShare += sale.salesPayroll || 0;
+            acc[key].salesCount += 1;
 
-          return acc;
-        }, {} as Record<string, EmployeeMonthlyShare>);
+            return acc;
+          },
+          {} as Record<string, EmployeeMonthlyShare>,
+        );
 
         setMonthlyShares(Object.values(sharesByEmployee));
       } catch (error) {

@@ -25,12 +25,12 @@ export default function InvestorProgress({
       totalPieces: acc.totalPieces + (Number(sale?.quantity) || 0),
       investorShare: acc.investorShare + (Number(sale?.investorShare) || 0),
     }),
-    { total: 0, totalPieces: 0, investorShare: 0 }
+    { total: 0, totalPieces: 0, investorShare: 0 },
   );
 
   const investorPercentage = Math.min(
     (totals.investorShare / INVESTOR_TARGET) * 100,
-    100
+    100,
   );
   const investorRemaining = Math.max(INVESTOR_TARGET - totals.investorShare, 0);
 
@@ -39,7 +39,7 @@ export default function InvestorProgress({
 
   const piecesPercentage = Math.min(
     (totals.totalPieces / PIECE_TARGET) * 100,
-    100
+    100,
   );
   const piecesRemaining = Math.max(PIECE_TARGET - totals.totalPieces, 0);
 

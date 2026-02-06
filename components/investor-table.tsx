@@ -21,7 +21,7 @@ interface InvestorMonthlyShare {
 
 export default function InvestorTable() {
   const [monthlyShares, setMonthlyShares] = useState<InvestorMonthlyShare[]>(
-    []
+    [],
   );
   const [loading, setLoading] = useState(true);
 
@@ -31,22 +31,25 @@ export default function InvestorTable() {
         const sales = await getSales();
 
         // Group sales by month
-        const sharesByMonth = sales.reduce((acc, sale) => {
-          const month = format(new Date(sale.date), "MMM yyyy");
+        const sharesByMonth = sales.reduce(
+          (acc, sale) => {
+            const month = format(new Date(sale.date), "MMM yyyy");
 
-          if (!acc[month]) {
-            acc[month] = {
-              month,
-              totalShare: 0,
-              salesCount: 0,
-            };
-          }
+            if (!acc[month]) {
+              acc[month] = {
+                month,
+                totalShare: 0,
+                salesCount: 0,
+              };
+            }
 
-          acc[month].totalShare += sale.investorShare;
-          acc[month].salesCount += 1;
+            acc[month].totalShare += sale.investorShare;
+            acc[month].salesCount += 1;
 
-          return acc;
-        }, {} as Record<string, InvestorMonthlyShare>);
+            return acc;
+          },
+          {} as Record<string, InvestorMonthlyShare>,
+        );
 
         setMonthlyShares(Object.values(sharesByMonth));
       } catch (error) {
