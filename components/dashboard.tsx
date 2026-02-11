@@ -52,11 +52,17 @@ export default function Dashboard({ data, onRefresh }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [sales, expenses] = await Promise.all([
-          getSales(),
-          getExpenses(),
+        const [salesResponse, expensesResponse] = await Promise.all([
+          fetch("/api/sales"),
+          fetch("/api/expenses"),
         ]);
-        setSalesData(sales);
+
+        const [sales, expenses] = await Promise.all([
+          salesResponse.json(),
+          expensesResponse.json(),
+        ]);
+
+        setSalesData(sales.sales || sales);
         setExpensesData(expenses);
       } catch (error) {
         toast({
