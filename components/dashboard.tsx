@@ -77,16 +77,21 @@ export default function Dashboard({ data, onRefresh }) {
   }, [toast]);
 
   // Calculate employee shares from sales data
-  const employeeShares = salesData.reduce((acc, sale) => {
+  const employeeShares = (salesData || []).reduce((acc, sale) => {
     const employee = sale.employee;
     const existing = acc.find((e) => e.employee === employee);
+    const total = sale.total || 0;
+    const profitPerPiece = 12.0;
+    const actualProfit = total * (profitPerPiece / 25.0);
+    const salesPayrollShare = actualProfit * (2.7 / 12.0); // Only sales payroll (2.70 of 12.00)
+
     if (existing) {
-      existing.totalShare += (sale.total * 6.944) / 100; // Sales + Packaging payroll
+      existing.totalShare += salesPayrollShare;
       existing.salesCount += 1;
     } else {
       acc.push({
         employee,
-        totalShare: (sale.total * 6.944) / 100,
+        totalShare: salesPayrollShare,
         salesCount: 1,
       });
     }
@@ -213,21 +218,31 @@ export default function Dashboard({ data, onRefresh }) {
   const fundTotals = salesData.reduce(
     (acc: Record<string, number>, sale: Sale) => {
       const total = sale.total || 0;
-      // Always calculate from total, ignore stored values
-      acc.productionCost += (total * 63) / 100;
-      acc.investorShare += (total * 12) / 100; // Force recalculation
-      acc.salesPayroll += (total * 6.944) / 100;
-      acc.packagingPayroll += (total * 6.944) / 100;
-      acc.savings += (total * 5.556) / 100;
-      acc.reinvestment += (total * 5.556) / 100;
+      const profitPerPiece = 12.0;
+      const actualProfit = total * (profitPerPiece / 25.0);
+
+      acc.productionCost += total - actualProfit;
+      acc.tithe += actualProfit * (1.2 / 12.0);
+      acc.founderPay += actualProfit * (1.5 / 12.0);
+      acc.businessSavings += actualProfit * (1.0 / 12.0);
+      acc.leadershipPayroll += actualProfit * (1.0 / 12.0);
+      acc.salesPayroll += actualProfit * (2.7 / 12.0);
+      acc.salesPayrollSavings += actualProfit * (0.3 / 12.0);
+      acc.packagingPayroll += actualProfit * (0.5 / 12.0);
+      acc.investorShare += actualProfit * (1.8 / 12.0);
+      acc.reinvestment += actualProfit * (2.0 / 12.0);
       return acc;
     },
     {
       productionCost: 0,
-      investorShare: 0,
+      tithe: 0,
+      founderPay: 0,
+      businessSavings: 0,
+      leadershipPayroll: 0,
       salesPayroll: 0,
+      salesPayrollSavings: 0,
       packagingPayroll: 0,
-      savings: 0,
+      investorShare: 0,
       reinvestment: 0,
     },
   );
@@ -239,9 +254,24 @@ export default function Dashboard({ data, onRefresh }) {
       fill: "#f59e0b",
     },
     {
-      name: "Investor Share",
-      value: fundTotals.investorShare.toFixed(2),
+      name: "Tithe",
+      value: fundTotals.tithe.toFixed(2),
+      fill: "#ef4444",
+    },
+    {
+      name: "Founder Pay",
+      value: fundTotals.founderPay.toFixed(2),
       fill: "#8b5cf6",
+    },
+    {
+      name: "Business Savings",
+      value: fundTotals.businessSavings.toFixed(2),
+      fill: "#10b981",
+    },
+    {
+      name: "Leadership Payroll",
+      value: fundTotals.leadershipPayroll.toFixed(2),
+      fill: "#06b6d4",
     },
     {
       name: "Sales Payroll",
@@ -249,14 +279,19 @@ export default function Dashboard({ data, onRefresh }) {
       fill: "#06b6d4",
     },
     {
+      name: "Sales Payroll Savings",
+      value: fundTotals.salesPayrollSavings.toFixed(2),
+      fill: "#10b981",
+    },
+    {
       name: "Packaging Payroll",
       value: fundTotals.packagingPayroll.toFixed(2),
       fill: "#06b6d4",
     },
     {
-      name: "Savings",
-      value: fundTotals.savings.toFixed(2),
-      fill: "#10b981",
+      name: "Investor Share",
+      value: fundTotals.investorShare.toFixed(2),
+      fill: "#8b5cf6",
     },
     {
       name: "Reinvestment",

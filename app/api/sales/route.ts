@@ -18,10 +18,11 @@ export async function POST(request: Request) {
       month: '2-digit',
       day: '2-digit'
     });
-
-    const total = Number(data.quantity) * Number(data.price);
     const id = Date.now().toString();
-    
+      const total = Number(data.quantity) * Number(data.price);
+    const profitPerPiece = 12.00; // Total profit split per piece
+    const actualProfit = total * (profitPerPiece / 25.00); // Converting to percentage of total sale
+
     const row = [
       id,
       dateValue,
@@ -31,13 +32,18 @@ export async function POST(request: Request) {
       data.price,
       total,
       data.event || "Normal",
-      data.productionCost,
-      data.investorShare,
-      data.salesPayroll,
-      data.packagingPayroll,
-      data.savings,
-      data.reinvestment
+      total - actualProfit, // Production Cost (25 - 12 = 13)
+      actualProfit * (1.20/12.00), // Tithe (1.20 of 12.00 profit)
+      actualProfit * (1.50/12.00), // Founder Pay
+      actualProfit * (1.00/12.00), // Business Savings
+      actualProfit * (1.00/12.00), // Leadership Payroll
+      actualProfit * (2.70/12.00), // Sales Payroll
+      actualProfit * (0.30/12.00), // Sales Payroll Savings
+      actualProfit * (0.50/12.00), // Packaging Payroll
+      actualProfit * (1.80/12.00), // Investor Share
+      actualProfit * (2.00/12.00)  // Reinvestment
     ];
+
 
     await sheets.spreadsheets.values.append({
       spreadsheetId: process.env.NEXT_PUBLIC_GOOGLE_SHEET_ID,
@@ -63,20 +69,20 @@ export async function POST(request: Request) {
 
 export async function GET() {
   try {
-    const credentials = JSON.parse(process.env.GOOGLE_SHEETS_CREDENTIALS!)
+    const credentials = JSON.parse(process.env.GOOGLE_SHEETS_CREDENTIALS!);
     const auth = new JWT({
       email: credentials.client_email,
       key: credentials.private_key,
       scopes: ["https://www.googleapis.com/auth/spreadsheets"],
-    })
-    const sheets = google.sheets({ version: "v4", auth })
+    });
+    const sheets = google.sheets({ version: "v4", auth });
 
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: process.env.NEXT_PUBLIC_GOOGLE_SHEET_ID,
-      range: "Sales!A:N"
-    })
+      range: "Sales!A:R" // Updated to include all columns
+    });
 
-    const rows = response.data.values || []
+    const rows = response.data.values || [];
     const sales = rows.slice(1).map((row) => ({
       id: row[0],
       date: row[1],
@@ -85,22 +91,21 @@ export async function GET() {
       quantity: Number(row[4]),
       price: Number(row[5]),
       total: Number(row[6]),
-      event: row[7],
-      productionCost: Number(row[8]),
-      investorShare: Number(row[9]),
-      salesPayroll: Number(row[10]),
-      packagingPayroll: Number(row[11]),
-      savings: Number(row[12]),
-      reinvestment: Number(row[13])
-    }))
+      event: row[7] || "Normal",
+      productionCost: Number(row[8]) || 0,
+      tithe: Number(row[9]) || 0,
+      founderPay: Number(row[10]) || 0,
+      businessSavings: Number(row[11]) || 0,
+      leadershipPayroll: Number(row[12]) || 0,
+      salesPayroll: Number(row[13]) || 0,
+      salesPayrollSavings: Number(row[14]) || 0,
+      packagingPayroll: Number(row[15]) || 0,
+      investorShare: Number(row[16]) || 0,
+      reinvestment: Number(row[17]) || 0,
+    }));
 
-    const uniqueDays = new Set(sales.map(sale => sale.date)).size;
-
-    return Response.json({ 
-      sales,
-      uniqueDays 
-    })
+    return Response.json(sales);
   } catch (error) {
-    return Response.json({ error: "Failed to fetch sales" }, { status: 500 })
+    return Response.json({ error: "Failed to fetch sales" }, { status: 500 });
   }
 }

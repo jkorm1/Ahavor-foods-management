@@ -12,10 +12,15 @@ export async function POST(request: Request) {
     })
     const sheets = google.sheets({ version: "v4", auth })
 
-    const id = Date.now().toString()
+    const id = Date.now().toString();
+    const dateValue = new Date(data.date).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    });
     const row = [
       id,
-      data.date,
+      dateValue, 
       data.category,
       data.description,
       data.amount

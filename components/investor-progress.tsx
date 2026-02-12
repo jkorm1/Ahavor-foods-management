@@ -20,11 +20,14 @@ export default function InvestorProgress({
 
   // Calculate totals from sales data with safe defaults
   const totals = (salesData || []).reduce(
-    (acc, sale) => ({
-      total: acc.total + (Number(sale?.total) || 0),
-      totalPieces: acc.totalPieces + (Number(sale?.quantity) || 0),
-      investorShare: acc.investorShare + (Number(sale?.investorShare) || 0),
-    }),
+    (acc, sale) => {
+      const total = Number(sale?.total) || 0;
+      return {
+        total: acc.total + total,
+        totalPieces: acc.totalPieces + (Number(sale?.quantity) || 0),
+        investorShare: acc.investorShare + total * 0.12, // Calculate 12% of total
+      };
+    },
     { total: 0, totalPieces: 0, investorShare: 0 },
   );
 

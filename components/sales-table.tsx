@@ -38,7 +38,7 @@ export default function SalesTable() {
         // Ensure result is an array
         const salesData = Array.isArray(result) ? result : result.sales || [];
 
-        // Process the sales data
+        // Process the sales data with correct profit distribution
         const processedSales = salesData.map((sale: any) => ({
           id: sale.id || "",
           date: sale.date || "",
@@ -49,10 +49,14 @@ export default function SalesTable() {
           total: Number(sale.total) || 0,
           event: sale.event || "",
           productionCost: Number(sale.productionCost) || 0,
-          investorShare: Number(sale.investorShare) || 0,
+          tithe: Number(sale.tithe) || 0,
+          founderPay: Number(sale.founderPay) || 0,
+          businessSavings: Number(sale.businessSavings) || 0,
+          leadershipPayroll: Number(sale.leadershipPayroll) || 0,
           salesPayroll: Number(sale.salesPayroll) || 0,
+          salesPayrollSavings: Number(sale.salesPayrollSavings) || 0,
           packagingPayroll: Number(sale.packagingPayroll) || 0,
-          savings: Number(sale.savings) || 0,
+          investorShare: Number(sale.investorShare) || 0,
           reinvestment: Number(sale.reinvestment) || 0,
         }));
 
@@ -158,7 +162,6 @@ export default function SalesTable() {
                 Total{" "}
                 {sortField === "total" && (sortDirection === "asc" ? "↑" : "↓")}
               </TableHead>
-
               <TableHead
                 className="cursor-pointer hover:bg-muted/50"
                 onClick={() => handleSort("event")}
@@ -166,7 +169,6 @@ export default function SalesTable() {
                 Event{" "}
                 {sortField === "event" && (sortDirection === "asc" ? "↑" : "↓")}
               </TableHead>
-
               <TableHead
                 className="cursor-pointer hover:bg-muted/50"
                 onClick={() => handleSort("productionCost")}
@@ -177,10 +179,33 @@ export default function SalesTable() {
               </TableHead>
               <TableHead
                 className="cursor-pointer hover:bg-muted/50"
-                onClick={() => handleSort("investorShare")}
+                onClick={() => handleSort("tithe")}
               >
-                Investor Share{" "}
-                {sortField === "investorShare" &&
+                Tithe{" "}
+                {sortField === "tithe" && (sortDirection === "asc" ? "↑" : "↓")}
+              </TableHead>
+              <TableHead
+                className="cursor-pointer hover:bg-muted/50"
+                onClick={() => handleSort("founderPay")}
+              >
+                Founder Pay{" "}
+                {sortField === "founderPay" &&
+                  (sortDirection === "asc" ? "↑" : "↓")}
+              </TableHead>
+              <TableHead
+                className="cursor-pointer hover:bg-muted/50"
+                onClick={() => handleSort("businessSavings")}
+              >
+                Business Savings{" "}
+                {sortField === "businessSavings" &&
+                  (sortDirection === "asc" ? "↑" : "↓")}
+              </TableHead>
+              <TableHead
+                className="cursor-pointer hover:bg-muted/50"
+                onClick={() => handleSort("leadershipPayroll")}
+              >
+                Leadership Payroll{" "}
+                {sortField === "leadershipPayroll" &&
                   (sortDirection === "asc" ? "↑" : "↓")}
               </TableHead>
               <TableHead
@@ -193,6 +218,14 @@ export default function SalesTable() {
               </TableHead>
               <TableHead
                 className="cursor-pointer hover:bg-muted/50"
+                onClick={() => handleSort("salesPayrollSavings")}
+              >
+                Sales Payroll Savings{" "}
+                {sortField === "salesPayrollSavings" &&
+                  (sortDirection === "asc" ? "↑" : "↓")}
+              </TableHead>
+              <TableHead
+                className="cursor-pointer hover:bg-muted/50"
                 onClick={() => handleSort("packagingPayroll")}
               >
                 Packaging Payroll{" "}
@@ -201,10 +234,10 @@ export default function SalesTable() {
               </TableHead>
               <TableHead
                 className="cursor-pointer hover:bg-muted/50"
-                onClick={() => handleSort("savings")}
+                onClick={() => handleSort("investorShare")}
               >
-                Savings{" "}
-                {sortField === "savings" &&
+                Investor Share{" "}
+                {sortField === "investorShare" &&
                   (sortDirection === "asc" ? "↑" : "↓")}
               </TableHead>
               <TableHead
@@ -217,6 +250,7 @@ export default function SalesTable() {
               </TableHead>
             </TableRow>
           </TableHeader>
+
           <TableBody>
             {filteredAndSortedSales.map((sale) => (
               <TableRow key={sale.id}>
@@ -229,36 +263,16 @@ export default function SalesTable() {
                 <TableCell>GHS {sale.price.toFixed(2)}</TableCell>
                 <TableCell>GHS {sale.total.toFixed(2)}</TableCell>
                 <TableCell>{sale.event || "Normal"}</TableCell>
-                <TableCell>
-                  GHS{" "}
-                  {sale.productionCost?.toFixed(2) ||
-                    (sale.total * 0.63).toFixed(2)}
-                </TableCell>
-                <TableCell>
-                  GHS{" "}
-                  {sale.investorShare?.toFixed(2) ||
-                    (sale.total * 0.12).toFixed(2)}
-                </TableCell>
-                <TableCell>
-                  GHS{" "}
-                  {sale.salesPayroll?.toFixed(2) ||
-                    (sale.total * 0.06944).toFixed(2)}
-                </TableCell>
-                <TableCell>
-                  GHS{" "}
-                  {sale.packagingPayroll?.toFixed(2) ||
-                    (sale.total * 0.06944).toFixed(2)}
-                </TableCell>
-                <TableCell>
-                  GHS{" "}
-                  {sale.savings?.toFixed(2) ||
-                    (sale.total * 0.05556).toFixed(2)}
-                </TableCell>
-                <TableCell>
-                  GHS{" "}
-                  {sale.reinvestment?.toFixed(2) ||
-                    (sale.total * 0.05556).toFixed(2)}
-                </TableCell>
+                <TableCell>GHS {sale.productionCost.toFixed(2)}</TableCell>
+                <TableCell>GHS {sale.tithe.toFixed(2)}</TableCell>
+                <TableCell>GHS {sale.founderPay.toFixed(2)}</TableCell>
+                <TableCell>GHS {sale.businessSavings.toFixed(2)}</TableCell>
+                <TableCell>GHS {sale.leadershipPayroll.toFixed(2)}</TableCell>
+                <TableCell>GHS {sale.salesPayroll.toFixed(2)}</TableCell>
+                <TableCell>GHS {sale.salesPayrollSavings.toFixed(2)}</TableCell>
+                <TableCell>GHS {sale.packagingPayroll.toFixed(2)}</TableCell>
+                <TableCell>GHS {sale.investorShare.toFixed(2)}</TableCell>
+                <TableCell>GHS {sale.reinvestment.toFixed(2)}</TableCell>
               </TableRow>
             ))}
           </TableBody>

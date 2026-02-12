@@ -21,10 +21,14 @@ export default function TablesPage() {
     totalExpenses: 0,
     totalProfit: 0,
     productionCost: 0,
-    investorShare: 0,
+    tithe: 0,
+    founderPay: 0,
+    businessSavings: 0,
+    leadershipPayroll: 0,
     salesPayroll: 0,
+    salesPayrollSavings: 0,
     packagingPayroll: 0,
-    savings: 0,
+    investorShare: 0,
     reinvestment: 0,
     totalLosses: 0,
   });
@@ -43,10 +47,6 @@ export default function TablesPage() {
           throw new Error(result.error || "Failed to fetch data");
         }
 
-        // Calculate unique days from sales data
-        const uniqueDays = new Set(result.sales?.map((sale) => sale.date) || [])
-          .size;
-
         // Calculate total losses from losses data
         const totalLosses =
           result.losses?.reduce(
@@ -54,16 +54,25 @@ export default function TablesPage() {
             0,
           ) || 0;
 
+        // Calculate profit distribution
+        const profitPerPiece = 12.0;
+        const totalSales = result.totalSales || 0;
+        const actualProfit = totalSales * (profitPerPiece / 25.0);
+
         setSummary({
-          totalSales: result.totalSales || 0,
+          totalSales,
           totalExpenses: result.totalExpenses || 0,
           totalProfit: result.netProfit || 0,
-          productionCost: result.totalSales * 0.63 || 0,
-          investorShare: result.totalSales * 0.12 || 0,
-          salesPayroll: result.totalSales * 0.06944 || 0,
-          packagingPayroll: result.totalSales * 0.06944 || 0,
-          savings: result.totalSales * 0.05556 || 0,
-          reinvestment: result.totalSales * 0.05556 || 0,
+          productionCost: totalSales - actualProfit,
+          tithe: actualProfit * (1.2 / 12.0),
+          founderPay: actualProfit * (1.5 / 12.0),
+          businessSavings: actualProfit * (1.0 / 12.0),
+          leadershipPayroll: actualProfit * (1.0 / 12.0),
+          salesPayroll: actualProfit * (2.7 / 12.0),
+          salesPayrollSavings: actualProfit * (0.3 / 12.0),
+          packagingPayroll: actualProfit * (0.5 / 12.0),
+          investorShare: actualProfit * (1.8 / 12.0),
+          reinvestment: actualProfit * (2.0 / 12.0),
           totalLosses,
         });
       } catch (error) {
@@ -73,10 +82,14 @@ export default function TablesPage() {
           totalExpenses: 0,
           totalProfit: 0,
           productionCost: 0,
-          investorShare: 0,
+          tithe: 0,
+          founderPay: 0,
+          businessSavings: 0,
+          leadershipPayroll: 0,
           salesPayroll: 0,
+          salesPayrollSavings: 0,
           packagingPayroll: 0,
-          savings: 0,
+          investorShare: 0,
           reinvestment: 0,
           totalLosses: 0,
         });
@@ -115,7 +128,7 @@ export default function TablesPage() {
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-9 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7 gap-4">
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium">Total Sales</CardTitle>
@@ -133,7 +146,7 @@ export default function TablesPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
+              <div className="text-2xl font-bold text-red-500">
                 GHS {summary.totalExpenses.toFixed(2)}
               </div>
             </CardContent>
@@ -146,9 +159,7 @@ export default function TablesPage() {
             </CardHeader>
             <CardContent>
               <div
-                className={`text-2xl font-bold ${
-                  summary.totalProfit >= 0 ? "text-green-600" : "text-red-600"
-                }`}
+                className={`text-2xl font-bold ${summary.totalProfit >= 0 ? "text-green-600" : "text-red-600"}`}
               >
                 GHS {summary.totalProfit.toFixed(2)}
               </div>
@@ -164,20 +175,65 @@ export default function TablesPage() {
               <div className="text-2xl font-bold text-accent">
                 GHS {summary.productionCost.toFixed(2)}
               </div>
-              <p className="text-xs text-muted-foreground mt-1">63% per sale</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                13.00 GHS per piece
+              </p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium">Tithe</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-red-400">
+                GHS {summary.tithe.toFixed(2)}
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                1.20 GHS per piece
+              </p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium">Founder Pay</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-purple-400">
+                GHS {summary.founderPay.toFixed(2)}
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                1.50 GHS per piece
+              </p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium">
-                Investor Share
+                Business Savings
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
-                GHS {summary.investorShare.toFixed(2)}
+              <div className="text-2xl font-bold text-green-400">
+                GHS {summary.businessSavings.toFixed(2)}
               </div>
-              <p className="text-xs text-muted-foreground mt-1">12% per sale</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                1.00 GHS per piece
+              </p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium">
+                Leadership Payroll
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-cyan-400">
+                GHS {summary.leadershipPayroll.toFixed(2)}
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                1.00 GHS per piece
+              </p>
             </CardContent>
           </Card>
           <Card>
@@ -187,11 +243,26 @@ export default function TablesPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
+              <div className="text-2xl font-bold text-cyan-400">
                 GHS {summary.salesPayroll.toFixed(2)}
               </div>
               <p className="text-xs text-muted-foreground mt-1">
-                6.944% per sale
+                2.70 GHS per piece
+              </p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium">
+                Sales Payroll Savings
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-green-400">
+                GHS {summary.salesPayrollSavings.toFixed(2)}
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                0.30 GHS per piece
               </p>
             </CardContent>
           </Card>
@@ -202,24 +273,26 @@ export default function TablesPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
+              <div className="text-2xl font-bold text-cyan-400">
                 GHS {summary.packagingPayroll.toFixed(2)}
               </div>
               <p className="text-xs text-muted-foreground mt-1">
-                6.944% per sale
+                0.50 GHS per piece
               </p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">Savings</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Investor Share
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
-                GHS {summary.savings.toFixed(2)}
+              <div className="text-2xl font-bold text-purple-400">
+                GHS {summary.investorShare.toFixed(2)}
               </div>
               <p className="text-xs text-muted-foreground mt-1">
-                5.556% per sale
+                1.80 GHS per piece
               </p>
             </CardContent>
           </Card>
@@ -230,11 +303,11 @@ export default function TablesPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
+              <div className="text-2xl font-bold text-green-400">
                 GHS {summary.reinvestment.toFixed(2)}
               </div>
               <p className="text-xs text-muted-foreground mt-1">
-                5.556% per sale
+                2.00 GHS per piece
               </p>
             </CardContent>
           </Card>

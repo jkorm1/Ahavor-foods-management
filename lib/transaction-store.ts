@@ -13,15 +13,20 @@ function saleToRow(sale: Sale): string[] {
     String(sale.quantity),
     String(sale.price),
     String(sale.total),
-    sale.event || "Normal", 
+    sale.event || "Normal",
     String(sale.productionCost),
-    String(sale.investorShare),
+    String(sale.tithe),
+    String(sale.founderPay),
+    String(sale.businessSavings),
+    String(sale.leadershipPayroll),
     String(sale.salesPayroll),
+    String(sale.salesPayrollSavings),
     String(sale.packagingPayroll),
-    String(sale.savings),
+    String(sale.investorShare),
     String(sale.reinvestment),
-  ]
+  ];
 }
+
 
 
 function expenseToRow(expense: Expense): string[] {
@@ -43,12 +48,16 @@ function rowToSale(row: string[]): Sale {
     total: Number(row[6]),
     event: row[7] || "Normal",
     productionCost: Number(row[8]) || 0,
-    investorShare: Number(row[9]) || 0,
-    salesPayroll: Number(row[10]) || 0,
-    packagingPayroll: Number(row[11]) || 0,
-    savings: Number(row[12]) || 0,
-    reinvestment: Number(row[13]) || 0,
-  }
+    tithe: Number(row[9]) || 0,
+    founderPay: Number(row[10]) || 0,
+    businessSavings: Number(row[11]) || 0,
+    leadershipPayroll: Number(row[12]) || 0,
+    salesPayroll: Number(row[13]) || 0,
+    salesPayrollSavings: Number(row[14]) || 0,
+    packagingPayroll: Number(row[15]) || 0,
+    investorShare: Number(row[16]) || 0,
+    reinvestment: Number(row[17]) || 0,
+  };
 }
 
 
@@ -134,7 +143,7 @@ export async function addWithdrawal(withdrawal: Omit<Withdrawal, "id">): Promise
 
 export async function getSales(): Promise<Sale[]> {
   try {
-    const { values } = await makeRequest('read', 'Sales!A2:O')
+    const { values } = await makeRequest('read', 'Sales!A:R')
     return values.map(rowToSale)
   } catch (error) {
     console.error("Failed to fetch sales:", error)

@@ -54,19 +54,24 @@ export default function SalesForm({ onSuccess }) {
     e.preventDefault();
 
     const total = Number(formData.quantity) * Number(formData.price);
-    const totalSales = Number(total.toFixed(2));
+    const profitPerPiece = 12.0;
+    const actualProfit = total * (profitPerPiece / 25.0);
 
     const submissionData = {
       ...formData,
       event:
         formData.event === "Normal" ? "Normal" : formData.eventName || "Normal",
-      total: totalSales,
-      productionCost: Number((totalSales * 0.63).toFixed(2)),
-      investorShare: Number((totalSales * 0.12).toFixed(2)),
-      salesPayroll: Number((totalSales * 0.06944).toFixed(2)),
-      packagingPayroll: Number((totalSales * 0.06944).toFixed(2)),
-      savings: Number((totalSales * 0.05556).toFixed(2)),
-      reinvestment: Number((totalSales * 0.05556).toFixed(2)),
+      total: total,
+      productionCost: total - actualProfit,
+      tithe: actualProfit * (1.2 / 12.0),
+      founderPay: actualProfit * (1.5 / 12.0),
+      businessSavings: actualProfit * (1.0 / 12.0),
+      leadershipPayroll: actualProfit * (1.0 / 12.0),
+      salesPayroll: actualProfit * (2.7 / 12.0),
+      salesPayrollSavings: actualProfit * (0.3 / 12.0),
+      packagingPayroll: actualProfit * (0.5 / 12.0),
+      investorShare: actualProfit * (1.8 / 12.0),
+      reinvestment: actualProfit * (2.0 / 12.0),
     };
 
     setLoading(true);
@@ -121,24 +126,19 @@ export default function SalesForm({ onSuccess }) {
         ).toFixed(2)
       : "0.00";
 
-  const productionCost = totalSales
-    ? ((Number(totalSales) * 63) / 100).toFixed(2)
-    : "0.00";
-  const investorShare = totalSales
-    ? ((Number(totalSales) * 12) / 100).toFixed(2)
-    : "0.00";
-  const salesPayroll = totalSales
-    ? ((Number(totalSales) * 6.944) / 100).toFixed(2)
-    : "0.00";
-  const packagingPayroll = totalSales
-    ? ((Number(totalSales) * 6.944) / 100).toFixed(2)
-    : "0.00";
-  const savings = totalSales
-    ? ((Number(totalSales) * 5.556) / 100).toFixed(2)
-    : "0.00";
-  const reinvestment = totalSales
-    ? ((Number(totalSales) * 5.556) / 100).toFixed(2)
-    : "0.00";
+  const profitPerPiece = 12.0;
+  const actualProfit = Number(totalSales) * (profitPerPiece / 25.0);
+
+  const productionCost = (Number(totalSales) - actualProfit).toFixed(2);
+  const tithe = (actualProfit * (1.2 / 12.0)).toFixed(2);
+  const founderPay = (actualProfit * (1.5 / 12.0)).toFixed(2);
+  const businessSavings = (actualProfit * (1.0 / 12.0)).toFixed(2);
+  const leadershipPayroll = (actualProfit * (1.0 / 12.0)).toFixed(2);
+  const salesPayroll = (actualProfit * (2.7 / 12.0)).toFixed(2);
+  const salesPayrollSavings = (actualProfit * (0.3 / 12.0)).toFixed(2);
+  const packagingPayroll = (actualProfit * (0.5 / 12.0)).toFixed(2);
+  const investorShare = (actualProfit * (1.8 / 12.0)).toFixed(2);
+  const reinvestment = (actualProfit * (2.0 / 12.0)).toFixed(2);
 
   return (
     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -297,24 +297,44 @@ export default function SalesForm({ onSuccess }) {
           </div>
           <div className="space-y-3">
             <div className="flex justify-between items-center p-3 bg-muted/50 rounded border border-border">
-              <span className="text-sm text-foreground">
-                Production Cost (63%)
-              </span>
+              <span className="text-sm text-foreground">Production Cost</span>
               <span className="font-semibold text-accent">
                 GHS {productionCost}
               </span>
             </div>
             <div className="flex justify-between items-center p-3 bg-muted/50 rounded border border-border">
               <span className="text-sm text-foreground">
-                Investor Share (12%)
+                Tithe (1.20 GHS/piece)
+              </span>
+              <span className="font-semibold text-red-400">GHS {tithe}</span>
+            </div>
+            <div className="flex justify-between items-center p-3 bg-muted/50 rounded border border-border">
+              <span className="text-sm text-foreground">
+                Founder Pay (1.50 GHS/piece)
               </span>
               <span className="font-semibold text-purple-400">
-                GHS {investorShare}
+                GHS {founderPay}
               </span>
             </div>
             <div className="flex justify-between items-center p-3 bg-muted/50 rounded border border-border">
               <span className="text-sm text-foreground">
-                Sales Payroll (6.944%)
+                Business Savings (1.00 GHS/piece)
+              </span>
+              <span className="font-semibold text-green-400">
+                GHS {businessSavings}
+              </span>
+            </div>
+            <div className="flex justify-between items-center p-3 bg-muted/50 rounded border border-border">
+              <span className="text-sm text-foreground">
+                Leadership Payroll (1.00 GHS/piece)
+              </span>
+              <span className="font-semibold text-cyan-400">
+                GHS {leadershipPayroll}
+              </span>
+            </div>
+            <div className="flex justify-between items-center p-3 bg-muted/50 rounded border border-border">
+              <span className="text-sm text-foreground">
+                Sales Payroll (2.70 GHS/piece)
               </span>
               <span className="font-semibold text-cyan-400">
                 GHS {salesPayroll}
@@ -322,21 +342,31 @@ export default function SalesForm({ onSuccess }) {
             </div>
             <div className="flex justify-between items-center p-3 bg-muted/50 rounded border border-border">
               <span className="text-sm text-foreground">
-                Packaging Payroll (6.944%)
+                Sales Payroll Savings (0.30 GHS/piece)
+              </span>
+              <span className="font-semibold text-green-400">
+                GHS {salesPayrollSavings}
+              </span>
+            </div>
+            <div className="flex justify-between items-center p-3 bg-muted/50 rounded border border-border">
+              <span className="text-sm text-foreground">
+                Packaging Payroll (0.50 GHS/piece)
               </span>
               <span className="font-semibold text-cyan-400">
                 GHS {packagingPayroll}
               </span>
             </div>
             <div className="flex justify-between items-center p-3 bg-muted/50 rounded border border-border">
-              <span className="text-sm text-foreground">Savings (5.556%)</span>
-              <span className="font-semibold text-green-400">
-                GHS {savings}
+              <span className="text-sm text-foreground">
+                Investor Share (1.80 GHS/piece)
+              </span>
+              <span className="font-semibold text-purple-400">
+                GHS {investorShare}
               </span>
             </div>
             <div className="flex justify-between items-center p-3 bg-muted/50 rounded border border-border">
               <span className="text-sm text-foreground">
-                Reinvestment (5.556%)
+                Reinvestment (2.00 GHS/piece)
               </span>
               <span className="font-semibold text-green-400">
                 GHS {reinvestment}
