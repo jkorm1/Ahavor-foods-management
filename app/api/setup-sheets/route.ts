@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
       },
       {
         name: "Customers",
-        headers: ["Name", "Contact", "Location", "Description"]
+        headers: ["Name", "Contact", "Location", "Email", "Description"]
       }
     ]
 

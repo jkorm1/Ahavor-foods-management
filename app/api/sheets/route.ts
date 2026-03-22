@@ -66,6 +66,7 @@ export async function POST(request: NextRequest) {
   { name: "Expenses", headers: ["ID", "Date", "Category", "Description", "Amount", "Notes"] },
   { name: "Withdrawals", headers: ["ID", "Date", "Type", "Amount", "Reason", "Notes"] },
   { name: "Summary", headers: ["Metric", "Value", "Last Updated"] },
+  { name: "Customers", headers: ["Name", "Contact", "Location", "Email", "Description"] }
 ]
 
 

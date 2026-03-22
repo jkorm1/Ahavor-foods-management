@@ -86,8 +86,9 @@ export default function SalesForm({ onSuccess }) {
 
       if (response.ok) {
         toast({
-          title: "Success",
-          description: "Sale recorded successfully",
+          title: "Success!",
+          description: "Your sale has been recorded successfully.",
+          variant: "default",
         });
         setFormData({
           date: new Date().toISOString().split("T")[0],
@@ -102,15 +103,17 @@ export default function SalesForm({ onSuccess }) {
         onSuccess();
       } else {
         toast({
-          title: "Error",
-          description: responseData.error || "Failed to record sale",
+          title: "Error!",
+          description:
+            responseData.error ||
+            "Failed to record your sale. Please try again.",
           variant: "destructive",
         });
       }
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to record sale",
+        title: "Error!",
+        description: "Failed to record your sale. Please try again.",
         variant: "destructive",
       });
     } finally {

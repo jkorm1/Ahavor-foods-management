@@ -19,7 +19,7 @@ export async function POST(request: Request) {
       day: '2-digit'
     });
     const id = Date.now().toString();
-      const total = Number(data.quantity) * Number(data.price);
+    const total = Number(data.quantity) * Number(data.price);
     const profitPerPiece = 12.00; // Total profit split per piece
     const actualProfit = total * (profitPerPiece / 25.00); // Converting to percentage of total sale
 

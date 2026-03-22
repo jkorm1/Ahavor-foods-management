@@ -12,6 +12,7 @@ export function CustomerForm({ onSuccess }: { onSuccess: () => void }) {
     name: "",
     contact: "",
     location: "",
+    email: "",
     description: "",
   });
   const [loading, setLoading] = useState(false);
@@ -29,7 +30,13 @@ export function CustomerForm({ onSuccess }: { onSuccess: () => void }) {
 
       if (response.ok) {
         setMessage("✅ Customer details saved successfully!");
-        setFormData({ name: "", contact: "", location: "", description: "" });
+        setFormData({
+          name: "",
+          contact: "",
+          location: "",
+          email: "",
+          description: "",
+        });
         onSuccess();
       } else {
         setMessage("❌ Failed to save customer details");
@@ -73,6 +80,18 @@ export function CustomerForm({ onSuccess }: { onSuccess: () => void }) {
             value={formData.location}
             onChange={(e) =>
               setFormData({ ...formData, location: e.target.value })
+            }
+            required
+          />
+        </div>
+        <div>
+          <Label htmlFor="email">Email</Label>
+          <Input
+            id="email"
+            type="email"
+            value={formData.email}
+            onChange={(e) =>
+              setFormData({ ...formData, email: e.target.value })
             }
             required
           />

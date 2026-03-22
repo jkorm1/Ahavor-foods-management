@@ -17,7 +17,7 @@ export async function GET() {
     // Get all customer details from the Customers sheet
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: sheetId,
-      range: "Customers!A:D",
+      range: "Customers!A:E",
     });
 
     const rows = response.data.values;
@@ -30,7 +30,8 @@ export async function GET() {
       name: row[0] || "",
       contact: row[1] || "",
       location: row[2] || "",
-      description: row[3] || "",
+      email: row[3] || "",
+      description: row[4] || "",
     }));
 
     return NextResponse.json(customers);
@@ -45,7 +46,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const { name, contact, location, description } = await request.json();
+    const { name, contact, location, email, description } = await request.json();
     
     const credentials = JSON.parse(process.env.GOOGLE_SHEETS_CREDENTIALS!);
     const auth = new JWT({
@@ -60,11 +61,12 @@ export async function POST(request: NextRequest) {
     // Add customer details to the Customers sheet
     await sheets.spreadsheets.values.append({
       spreadsheetId: sheetId,
-      range: "Customers!A:D",
+      range: "Customers!A:E",
       valueInputOption: "USER_ENTERED",
       insertDataOption: "INSERT_ROWS",
       requestBody: {
-        values: [[name, contact, location, description]],
+        values: [[name, `'${contact}`, location, email, description]],
+
       },
     });
 

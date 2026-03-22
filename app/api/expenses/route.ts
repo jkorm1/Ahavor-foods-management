@@ -11,16 +11,18 @@ export async function POST(request: Request) {
       scopes: ["https://www.googleapis.com/auth/spreadsheets"],
     })
     const sheets = google.sheets({ version: "v4", auth })
-
     const id = Date.now().toString();
     const dateValue = new Date(data.date).toLocaleDateString('en-US', {
       year: 'numeric',
       month: '2-digit',
       day: '2-digit'
     });
+
+
+ // Use the date directly as received from the form
     const row = [
       id,
-      dateValue, 
+      dateValue,
       data.category,
       data.description,
       data.amount

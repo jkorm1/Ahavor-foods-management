@@ -4,25 +4,66 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/auth-context";
 import { Loader2, Lock, Shield } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export function InvestorLogin() {
-  const [password, setPassword] = useState("");
+  const [investorPassword, setInvestorPassword] = useState("");
+  const [salesPassword, setSalesPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
   const { toast } = useToast();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleInvestorLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
 
+    // Check if password is empty
+    if (!investorPassword.trim()) {
+      setError("Please enter your password.");
+      setIsLoading(false);
+      return;
+    }
+
+    // Simulate network delay
     await new Promise((resolve) => setTimeout(resolve, 500));
 
-    const result = login(password);
+    const result = login(investorPassword, "investor");
+    if (!result.success) {
+      setError("Invalid password. Please try again.");
+      setIsLoading(false);
+      return;
+    }
+
+    toast({
+      title: "Welcome back!",
+      description: `Welcome, ${result.name}!`,
+    });
+
+    setError("");
+    setIsLoading(false);
+  };
+
+  const handleSalesLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
+
+    // Check if password is empty
+    if (!salesPassword.trim()) {
+      setError("Please enter your password.");
+      setIsLoading(false);
+      return;
+    }
+
+    // Simulate network delay
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    const result = login(salesPassword, "sales");
     if (!result.success) {
       setError("Invalid password. Please try again.");
       setIsLoading(false);
@@ -63,10 +104,10 @@ export function InvestorLogin() {
               </div>
             </div>
             <CardTitle className="text-3xl font-bold text-center bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
-              Investor Access
+              Ahavor Foods
             </CardTitle>
             <p className="text-sm text-muted-foreground text-center">
-              Enter your password to access the system
+              Select your role to access the system
             </p>
           </div>
         </CardHeader>
@@ -78,50 +119,106 @@ export function InvestorLogin() {
             <span>Secure Connection</span>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <label
-                htmlFor="password"
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex items-center space-x-2"
-              >
-                <Lock className="h-4 w-4" />
-                <span>Password</span>
-              </label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="Enter your secure password"
-                value={password}
-                onChange={(e) => {
-                  setPassword(e.target.value);
-                  setError("");
-                }}
-                className={`h-12 ${
-                  error ? "border-destructive focus:border-destructive" : ""
-                }`}
-                disabled={isLoading}
-              />
-              {error && (
-                <p className="text-sm text-destructive animate-in fade-in-0 slide-in-from-top-2">
-                  {error}
-                </p>
-              )}
-            </div>
-            <Button
-              type="submit"
-              className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-medium shadow-lg hover:shadow-xl transition-all duration-200"
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Signing in...
-                </>
-              ) : (
-                "Access System"
-              )}
-            </Button>
-          </form>
+          <Tabs defaultValue="investor" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 mb-6">
+              <TabsTrigger value="investor">Admin</TabsTrigger>
+              <TabsTrigger value="sales">Sales Executive</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="investor">
+              <form onSubmit={handleInvestorLogin} className="space-y-4">
+                <div className="space-y-2">
+                  <label
+                    htmlFor="investor-password"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex items-center space-x-2"
+                  >
+                    <Lock className="h-4 w-4" />
+                    <span>Password</span>
+                  </label>
+                  <Input
+                    id="investor-password"
+                    type="password"
+                    placeholder="Enter your secure password"
+                    value={investorPassword}
+                    onChange={(e) => {
+                      setInvestorPassword(e.target.value);
+                      setError("");
+                    }}
+                    className={`h-12 ${
+                      error ? "border-destructive focus:border-destructive" : ""
+                    }`}
+                    disabled={isLoading}
+                  />
+                  {error && (
+                    <p className="text-sm text-destructive animate-in fade-in-0 slide-in-from-top-2">
+                      {error}
+                    </p>
+                  )}
+                </div>
+                <Button
+                  type="submit"
+                  className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-medium shadow-lg hover:shadow-xl transition-all duration-200"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Signing in...
+                    </>
+                  ) : (
+                    "Access as Investor"
+                  )}
+                </Button>
+              </form>
+            </TabsContent>
+
+            <TabsContent value="sales">
+              <form onSubmit={handleSalesLogin} className="space-y-4">
+                <div className="space-y-2">
+                  <label
+                    htmlFor="sales-password"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex items-center space-x-2"
+                  >
+                    <Lock className="h-4 w-4" />
+                    <span>Password</span>
+                  </label>
+                  <Input
+                    id="sales-password"
+                    type="password"
+                    placeholder="Enter your secure password"
+                    value={salesPassword}
+                    onChange={(e) => {
+                      setSalesPassword(e.target.value);
+                      setError("");
+                    }}
+                    className={`h-12 ${
+                      error ? "border-destructive focus:border-destructive" : ""
+                    }`}
+                    disabled={isLoading}
+                  />
+                  {error && (
+                    <p className="text-sm text-destructive animate-in fade-in-0 slide-in-from-top-2">
+                      {error}
+                    </p>
+                  )}
+                </div>
+                <Button
+                  type="submit"
+                  className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-medium shadow-lg hover:shadow-xl transition-all duration-200"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Signing in...
+                    </>
+                  ) : (
+                    "Access as Sales Executive"
+                  )}
+                </Button>
+              </form>
+            </TabsContent>
+          </Tabs>
 
           {/* Footer decoration */}
           <div className="flex items-center justify-center space-x-2 text-xs text-muted-foreground pt-4 border-t border-border/50">

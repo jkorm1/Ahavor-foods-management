@@ -16,6 +16,7 @@ interface Customer {
   name: string;
   contact: string;
   location: string;
+  email: string;
   description: string;
 }
 
@@ -60,6 +61,7 @@ export default function CustomersPage() {
                       <TableHead>Name</TableHead>
                       <TableHead>Contact</TableHead>
                       <TableHead>Location</TableHead>
+                      <TableHead>Email</TableHead>
                       <TableHead>Description</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -69,6 +71,7 @@ export default function CustomersPage() {
                         <TableCell>{customer.name}</TableCell>
                         <TableCell>{customer.contact}</TableCell>
                         <TableCell>{customer.location}</TableCell>
+                        <TableCell>{customer.email}</TableCell>
                         <TableCell>{customer.description}</TableCell>
                       </TableRow>
                     ))}

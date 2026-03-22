@@ -15,7 +15,7 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const { investorName } = useAuth();
+  const { userName } = useAuth();
 
   useEffect(() => {
     fetchData();
@@ -63,9 +63,9 @@ export default function Home() {
         <div className="mx-auto max-w-7xl px-4 py-6">
           <h1 className="text-3xl font-bold text-foreground">
             Ahavor Foods Financial Dashboard
-            {investorName && (
+            {userName && (
               <span className="ml-2 text-sm text-muted-foreground">
-                (Welcome, {investorName})
+                (Welcome, {userName})
               </span>
             )}
           </h1>
