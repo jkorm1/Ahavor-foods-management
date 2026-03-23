@@ -65,7 +65,11 @@ export default function Home() {
             Ahavor Foods Financial Dashboard
             {userName && (
               <span className="ml-2 text-sm text-muted-foreground">
-                (Welcome, {userName})
+                (Welcome,{" "}
+                <span className="bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 text-transparent bg-clip-text font-semibold">
+                  {userName}
+                </span>
+                )
               </span>
             )}
           </h1>

@@ -152,9 +152,6 @@ export function LayoutClient({ children }: { children: React.ReactNode }) {
           </div>
 
           <div className="flex items-center">
-            <div className="mr-4 text-sm">
-              <span>Welcome, {userName}</span>
-            </div>
             <LogoutButton />
           </div>
         </nav>

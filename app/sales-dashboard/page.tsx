@@ -88,7 +88,11 @@ export default function SalesDashboardPage() {
       <div className="mb-6">
         <h1 className="text-3xl font-bold">Sales Dashboard</h1>
         <p className="text-muted-foreground">
-          Welcome, {userName}! Here's an overview of sales performance.
+          Welcome,{" "}
+          <span className="bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 text-transparent bg-clip-text font-semibold">
+            {userName}
+          </span>
+          ! Here's an overview of sales performance.
         </p>
       </div>
 
