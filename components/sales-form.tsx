@@ -13,6 +13,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { validateSale } from "@/lib/validation";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const employees = [
   "Christian Frimpong",
@@ -21,15 +28,28 @@ const employees = [
   "Taufik Yussif",
 ];
 
+// Define products with their prices
+const PRODUCTS = [
+  {
+    id: "ahavor-tombrown",
+    name: "Ahavor Tombrown",
+    price: 25,
+  },
+  {
+    id: "ahavor-oats",
+    name: "Ahavor Oats",
+    price: 20,
+  },
+] as const;
+
 export default function SalesForm({ onSuccess }) {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split("T")[0],
-    product: "Ahavor Tombrown",
+    productId: "ahavor-tombrown", // Default to first product
     quantity: "",
-    price: "",
     employee: employees[0],
     event: "Normal",
     eventName: "",
@@ -50,15 +70,33 @@ export default function SalesForm({ onSuccess }) {
     }
   };
 
+  const handleProductChange = (value: string) => {
+    setFormData((prev) => ({ ...prev, productId: value }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const total = Number(formData.quantity) * Number(formData.price);
+    const product = PRODUCTS.find((p) => p.id === formData.productId);
+    if (!product) {
+      toast({
+        title: "Error!",
+        description: "Please select a product",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const total = Number(formData.quantity) * product.price;
     const profitPerPiece = 12.0;
     const actualProfit = total * (profitPerPiece / 25.0);
 
     const submissionData = {
-      ...formData,
+      date: formData.date,
+      employee: formData.employee,
+      product: product.name,
+      price: product.price,
+      quantity: formData.quantity,
       event:
         formData.event === "Normal" ? "Normal" : formData.eventName || "Normal",
       total: total,
@@ -92,9 +130,8 @@ export default function SalesForm({ onSuccess }) {
         });
         setFormData({
           date: new Date().toISOString().split("T")[0],
-          product: "Ahavor Tombrown",
+          productId: "ahavor-tombrown",
           quantity: "",
-          price: "",
           employee: employees[0],
           event: "Normal",
           eventName: "",
@@ -121,12 +158,12 @@ export default function SalesForm({ onSuccess }) {
     }
   };
 
+  const selectedProduct = PRODUCTS.find((p) => p.id === formData.productId);
   const totalSales =
-    formData.quantity && formData.price
-      ? (
-          Number.parseFloat(formData.quantity) *
-          Number.parseFloat(formData.price)
-        ).toFixed(2)
+    selectedProduct && formData.quantity
+      ? (Number.parseFloat(formData.quantity) * selectedProduct.price).toFixed(
+          2,
+        )
       : "0.00";
 
   const profitPerPiece = 12.0;
@@ -184,15 +221,22 @@ export default function SalesForm({ onSuccess }) {
             </div>
             <div className="space-y-2">
               <Label htmlFor="product">Product</Label>
-              <Input
-                id="product"
-                name="product"
-                type="text"
-                value={formData.product}
-                onChange={handleChange}
-                className="bg-input border-border"
+              <Select
+                value={formData.productId}
+                onValueChange={handleProductChange}
                 required
-              />
+              >
+                <SelectTrigger id="product">
+                  <SelectValue placeholder="Select a product" />
+                </SelectTrigger>
+                <SelectContent>
+                  {PRODUCTS.map((product) => (
+                    <SelectItem key={product.id} value={product.id}>
+                      {product.name} (GHS {product.price})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               {errors.product && (
                 <p className="text-xs text-destructive">{errors.product}</p>
               )}
@@ -216,25 +260,19 @@ export default function SalesForm({ onSuccess }) {
                 <p className="text-xs text-destructive">{errors.quantity}</p>
               )}
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="price">Unit Price (GHS)</Label>
-              <Input
-                id="price"
-                name="price"
-                type="number"
-                step="0.01"
-                value={formData.price}
-                onChange={handleChange}
-                placeholder="0"
-                className={`bg-input border-border ${
-                  errors.price ? "border-destructive" : ""
-                }`}
-                required
-              />
-              {errors.price && (
-                <p className="text-xs text-destructive">{errors.price}</p>
-              )}
-            </div>
+
+            {selectedProduct && formData.quantity && (
+              <div className="bg-muted p-3 rounded-md">
+                <div className="flex justify-between">
+                  <span>Price per unit:</span>
+                  <span>GHS {selectedProduct.price}</span>
+                </div>
+                <div className="flex justify-between font-bold mt-2">
+                  <span>Total:</span>
+                  <span>GHS {totalSales}</span>
+                </div>
+              </div>
+            )}
 
             <div className="space-y-2">
               <Label htmlFor="event">Event Type</Label>

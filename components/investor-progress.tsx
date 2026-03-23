@@ -3,9 +3,8 @@ import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/contexts/auth-context";
 import { useState, useEffect } from "react";
 
-const INVESTOR_TARGET = 18000;
-const SALES_TARGET = 151200;
-const PIECE_TARGET = 15120;
+const SALES_TARGET = 500000;
+const PIECE_TARGET = 20000;
 
 export default function InvestorProgress({
   salesData = [],
@@ -31,12 +30,6 @@ export default function InvestorProgress({
     { total: 0, totalPieces: 0, investorShare: 0 },
   );
 
-  const investorPercentage = Math.min(
-    (totals.investorShare / INVESTOR_TARGET) * 100,
-    100,
-  );
-  const investorRemaining = Math.max(INVESTOR_TARGET - totals.investorShare, 0);
-
   const salesPercentage = Math.min((totals.total / SALES_TARGET) * 100, 100);
   const salesRemaining = Math.max(SALES_TARGET - totals.total, 0);
 
@@ -54,7 +47,7 @@ export default function InvestorProgress({
     <Card className="w-full">
       <CardHeader>
         <CardTitle className="text-lg">
-          Investment Progress
+          Sales Progress
           {investorName && (
             <span className="ml-2 text-sm text-muted-foreground">
               ({investorName})
@@ -67,37 +60,9 @@ export default function InvestorProgress({
           <div className="space-y-2">
             <div className="h-2 w-full bg-gray-200 rounded animate-pulse" />
             <div className="h-2 w-full bg-gray-200 rounded animate-pulse" />
-            <div className="h-2 w-full bg-gray-200 rounded animate-pulse" />
           </div>
         ) : (
           <>
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span>Investment Target</span>
-                <span className="font-medium">
-                  GHS{" "}
-                  {totals.investorShare.toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}{" "}
-                  / GHS{" "}
-                  {INVESTOR_TARGET.toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
-                </span>
-              </div>
-              <Progress value={investorPercentage} className="w-full" />
-              <div className="text-sm text-muted-foreground">
-                {investorPercentage.toFixed(1)}% - GHS{" "}
-                {investorRemaining.toLocaleString(undefined, {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}{" "}
-                remaining
-              </div>
-            </div>
-
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <span>Sales Target</span>
@@ -127,7 +92,7 @@ export default function InvestorProgress({
 
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <span>Pieces Target</span>
+                <span>Unit Target</span>
                 <span className="font-medium">
                   {totals.totalPieces.toLocaleString()} /{" "}
                   {PIECE_TARGET.toLocaleString()} pieces

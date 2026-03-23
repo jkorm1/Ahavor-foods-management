@@ -7,6 +7,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/auth-context";
 import { useToast } from "@/hooks/use-toast";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const employees = [
   "Christian Frimpong",
@@ -15,14 +22,27 @@ const employees = [
   "Taufik Yussif",
 ];
 
+// Define products with their prices
+const PRODUCTS = [
+  {
+    id: "ahavor-tombrown",
+    name: "Ahavor Tombrown",
+    price: 25,
+  },
+  {
+    id: "ahavor-oats",
+    name: "Ahavor Oats",
+    price: 20,
+  },
+] as const;
+
 export default function SalesEntryPage() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split("T")[0],
-    product: "Ahavor Tombrown",
+    productId: "ahavor-tombrown", // Default to first product
     quantity: "",
-    price: "",
     employee: employees[0],
     event: "Normal",
     eventName: "",
@@ -44,16 +64,35 @@ export default function SalesEntryPage() {
     }));
   };
 
+  const handleProductChange = (value: string) => {
+    setFormData((prev) => ({ ...prev, productId: value }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    const total = Number(formData.quantity) * Number(formData.price);
+    const product = PRODUCTS.find((p) => p.id === formData.productId);
+    if (!product) {
+      toast({
+        title: "Error!",
+        description: "Please select a product",
+        variant: "destructive",
+      });
+      setLoading(false);
+      return;
+    }
+
+    const total = Number(formData.quantity) * product.price;
     const profitPerPiece = 12.0;
     const actualProfit = total * (profitPerPiece / 25.0);
 
     const submissionData = {
-      ...formData,
+      date: formData.date,
+      employee: formData.employee,
+      product: product.name,
+      price: product.price,
+      quantity: formData.quantity,
       event:
         formData.event === "Normal" ? "Normal" : formData.eventName || "Normal",
       total: total,
@@ -86,9 +125,8 @@ export default function SalesEntryPage() {
         });
         setFormData({
           date: new Date().toISOString().split("T")[0],
-          product: "Ahavor Tombrown",
+          productId: "ahavor-tombrown",
           quantity: "",
-          price: "",
           employee: salesName,
           event: "Normal",
           eventName: "",
@@ -112,6 +150,11 @@ export default function SalesEntryPage() {
       setLoading(false);
     }
   };
+
+  const selectedProduct = PRODUCTS.find((p) => p.id === formData.productId);
+  const totalPrice = selectedProduct
+    ? selectedProduct.price * Number(formData.quantity)
+    : 0;
 
   return (
     <div className="container mx-auto py-6">
@@ -153,15 +196,22 @@ export default function SalesEntryPage() {
 
               <div className="space-y-2">
                 <Label htmlFor="product">Product</Label>
-                <Input
-                  id="product"
-                  name="product"
-                  type="text"
-                  value={formData.product}
-                  onChange={handleChange}
-                  className="bg-input border-border"
+                <Select
+                  value={formData.productId}
+                  onValueChange={handleProductChange}
                   required
-                />
+                >
+                  <SelectTrigger id="product">
+                    <SelectValue placeholder="Select a product" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {PRODUCTS.map((product) => (
+                      <SelectItem key={product.id} value={product.id}>
+                        {product.name} (GHS {product.price})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="space-y-2">
@@ -179,20 +229,18 @@ export default function SalesEntryPage() {
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="price">Unit Price (GHS)</Label>
-                <Input
-                  id="price"
-                  name="price"
-                  type="number"
-                  step="0.01"
-                  value={formData.price}
-                  onChange={handleChange}
-                  placeholder="0"
-                  className="bg-input border-border"
-                  required
-                />
-              </div>
+              {selectedProduct && formData.quantity && (
+                <div className="bg-muted p-3 rounded-md">
+                  <div className="flex justify-between">
+                    <span>Price per unit:</span>
+                    <span>GHS {selectedProduct.price}</span>
+                  </div>
+                  <div className="flex justify-between font-bold mt-2">
+                    <span>Total:</span>
+                    <span>GHS {totalPrice.toFixed(2)}</span>
+                  </div>
+                </div>
+              )}
 
               <div className="space-y-2">
                 <Label htmlFor="event">Event Type</Label>

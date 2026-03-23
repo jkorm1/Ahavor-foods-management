@@ -83,29 +83,42 @@ export async function GET() {
     });
 
     const rows = response.data.values || [];
-    const sales = rows.slice(1).map((row) => ({
-      id: row[0],
-      date: row[1],
-      employee: row[2],
-      product: row[3],
-      quantity: Number(row[4]),
-      price: Number(row[5]),
-      total: Number(row[6]),
-      event: row[7] || "Normal",
-      productionCost: Number(row[8]) || 0,
-      tithe: Number(row[9]) || 0,
-      founderPay: Number(row[10]) || 0,
-      businessSavings: Number(row[11]) || 0,
-      leadershipPayroll: Number(row[12]) || 0,
-      salesPayroll: Number(row[13]) || 0,
-      salesPayrollSavings: Number(row[14]) || 0,
-      packagingPayroll: Number(row[15]) || 0,
-      investorShare: Number(row[16]) || 0,
-      reinvestment: Number(row[17]) || 0,
-    }));
+    const sales = rows.slice(1).map((row) => {
+      // Parse the date from the format "MM/DD/YYYY" to "YYYY-MM-DD"
+      let dateStr = row[1] || "";
+      if (dateStr) {
+        const dateParts = dateStr.split("/");
+        if (dateParts.length === 3) {
+          dateStr = `${dateParts[2]}-${dateParts[0].padStart(2, '0')}-${dateParts[1].padStart(2, '0')}`;
+        }
+      }
+      
+      return {
+        id: row[0],
+        date: dateStr,
+        employee: row[2],
+        product: row[3],
+        quantity: Number(row[4]) || 0,
+        price: Number(row[5]) || 0,
+        total: Number(row[6]) || 0,
+        event: row[7] || "Normal",
+        productionCost: Number(row[8]) || 0,
+        tithe: Number(row[9]) || 0,
+        founderPay: Number(row[10]) || 0,
+        businessSavings: Number(row[11]) || 0,
+        leadershipPayroll: Number(row[12]) || 0,
+        salesPayroll: Number(row[13]) || 0,
+        salesPayrollSavings: Number(row[14]) || 0,
+        packagingPayroll: Number(row[15]) || 0,
+        investorShare: Number(row[16]) || 0,
+        reinvestment: Number(row[17]) || 0,
+      };
+    });
 
+    console.log("Processed sales data:", sales); // Debug log
     return Response.json(sales);
   } catch (error) {
+    console.error("Error fetching sales:", error);
     return Response.json({ error: "Failed to fetch sales" }, { status: 500 });
   }
 }
