@@ -25,7 +25,7 @@ const employees = [
   "Christian Frimpong",
   "Joseph Korm",
   "Kofi Adu Jnr",
-  "Taufik Yussif",
+  "Setordzi",
 ];
 
 // Define products with their prices

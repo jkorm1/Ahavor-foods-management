@@ -56,14 +56,17 @@ export default function TablesPage() {
 
         // Calculate profit distribution
         const profitPerPiece = 12.0;
+        const productionCostPerPiece = 13.0;
         const totalSales = result.totalSales || 0;
+        const totalExpenses = result.totalExpenses || 0;
         const actualProfit = totalSales * (profitPerPiece / 25.0);
+        const productionCost = totalSales * (productionCostPerPiece / 25.0);
 
         setSummary({
           totalSales,
-          totalExpenses: result.totalExpenses || 0,
-          totalProfit: result.netProfit || 0,
-          productionCost: totalSales - actualProfit,
+          totalExpenses,
+          totalProfit: totalSales - totalExpenses,
+          productionCost,
           tithe: actualProfit * (1.2 / 12.0),
           founderPay: actualProfit * (1.5 / 12.0),
           businessSavings: actualProfit * (1.0 / 12.0),
