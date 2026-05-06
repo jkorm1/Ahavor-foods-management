@@ -7,9 +7,21 @@ import { useAuth } from "@/contexts/auth-context";
 import { LogoutButton } from "@/components/logout-button";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Menu, X } from "lucide-react";
+import {
+  Menu,
+  X,
+  Home,
+  Table,
+  Users,
+  ShoppingCart,
+  Settings,
+  LayoutDashboard,
+  Package,
+  LogOut,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { cn } from "@/lib/utils";
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, userRole } = useAuth();
@@ -36,121 +48,153 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-const MobileNav = () => {
+const MobileNav = ({ closeMenu }: { closeMenu: () => void }) => {
   const { userRole } = useAuth();
   const pathname = usePathname();
-  const [, setMobileMenuOpen] = useState(false);
 
   return (
-    <div className="flex flex-col space-y-4 py-4">
-      {userRole === "investor" && (
-        <>
-          <Link
-            href="/"
-            onClick={() => setMobileMenuOpen(false)}
-            className={`text-lg font-medium transition-colors hover:text-foreground/80 hover:underline ${
-              pathname === "/"
-                ? "text-foreground border-b-2 border-primary"
-                : "text-foreground/60"
-            }`}
-          >
-            Dashboard
-          </Link>
-          <Link
-            href="/tables"
-            onClick={() => setMobileMenuOpen(false)}
-            className={`text-lg font-medium transition-colors hover:text-foreground/80 hover:underline ${
-              pathname === "/tables"
-                ? "text-foreground border-b-2 border-primary"
-                : "text-foreground/60"
-            }`}
-          >
-            Tables
-          </Link>
-          <Link
-            href="/customers"
-            onClick={() => setMobileMenuOpen(false)}
-            className={`text-lg font-medium transition-colors hover:text-foreground/80 hover:underline ${
-              pathname === "/customers"
-                ? "text-foreground border-b-2 border-primary"
-                : "text-foreground/60"
-            }`}
-          >
-            Customers
-          </Link>
-          <Link
-            href="/orders"
-            onClick={() => setMobileMenuOpen(false)}
-            className={`text-lg font-medium transition-colors hover:text-foreground/80 hover:underline ${
-              pathname === "/orders"
-                ? "text-foreground border-b-2 border-primary"
-                : "text-foreground/60"
-            }`}
-          >
-            Orders
-          </Link>
-          <Link
-            href="/setup"
-            onClick={() => setMobileMenuOpen(false)}
-            className={`text-lg font-medium transition-colors hover:text-foreground/80 hover:underline ${
-              pathname === "/setup"
-                ? "text-foreground border-b-2 border-primary"
-                : "text-foreground/60"
-            }`}
-          >
-            Setup
-          </Link>
-        </>
-      )}
+    <div className="flex flex-col h-full">
+      <div className="flex-1 overflow-y-auto py-6 px-4">
+        <div className="mb-6 px-2">
+          <h2 className="text-lg font-semibold text-foreground">Menu</h2>
+        </div>
 
-      {userRole === "sales" && (
-        <>
-          <Link
-            href="/sales-dashboard"
-            onClick={() => setMobileMenuOpen(false)}
-            className={`text-lg font-medium transition-colors hover:text-foreground/80 hover:underline ${
-              pathname === "/sales-dashboard"
-                ? "text-foreground border-b-2 border-primary"
-                : "text-foreground/60"
-            }`}
-          >
-            Dashboard
-          </Link>
-          <Link
-            href="/sales-entry"
-            onClick={() => setMobileMenuOpen(false)}
-            className={`text-lg font-medium transition-colors hover:text-foreground/80 hover:underline ${
-              pathname === "/sales-entry"
-                ? "text-foreground border-b-2 border-primary"
-                : "text-foreground/60"
-            }`}
-          >
-            Sales Entry
-          </Link>
-          <Link
-            href="/sales-customers"
-            onClick={() => setMobileMenuOpen(false)}
-            className={`text-lg font-medium transition-colors hover:text-foreground/80 hover:underline ${
-              pathname === "/sales-customers"
-                ? "text-foreground border-b-2 border-primary"
-                : "text-foreground/60"
-            }`}
-          >
-            Customers
-          </Link>
-          <Link
-            href="/sales-tables"
-            onClick={() => setMobileMenuOpen(false)}
-            className={`text-lg font-medium transition-colors hover:text-foreground/80 hover:underline ${
-              pathname === "/sales-tables"
-                ? "text-foreground border-b-2 border-primary"
-                : "text-foreground/60"
-            }`}
-          >
-            Sales Records
-          </Link>
-        </>
-      )}
+        <div className="space-y-1">
+          {userRole === "investor" && (
+            <>
+              <Link
+                href="/"
+                onClick={closeMenu}
+                className={cn(
+                  "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all hover:bg-accent",
+                  pathname === "/"
+                    ? "bg-accent text-accent-foreground"
+                    : "text-foreground/70",
+                )}
+              >
+                <Home className="h-5 w-5" />
+                Dashboard
+              </Link>
+              <Link
+                href="/tables"
+                onClick={closeMenu}
+                className={cn(
+                  "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all hover:bg-accent",
+                  pathname === "/tables"
+                    ? "bg-accent text-accent-foreground"
+                    : "text-foreground/70",
+                )}
+              >
+                <Table className="h-5 w-5" />
+                Tables
+              </Link>
+              <Link
+                href="/customers"
+                onClick={closeMenu}
+                className={cn(
+                  "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all hover:bg-accent",
+                  pathname === "/customers"
+                    ? "bg-accent text-accent-foreground"
+                    : "text-foreground/70",
+                )}
+              >
+                <Users className="h-5 w-5" />
+                Customers
+              </Link>
+              <Link
+                href="/orders"
+                onClick={closeMenu}
+                className={cn(
+                  "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all hover:bg-accent",
+                  pathname === "/orders"
+                    ? "bg-accent text-accent-foreground"
+                    : "text-foreground/70",
+                )}
+              >
+                <ShoppingCart className="h-5 w-5" />
+                Orders
+              </Link>
+              <Link
+                href="/setup"
+                onClick={closeMenu}
+                className={cn(
+                  "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all hover:bg-accent",
+                  pathname === "/setup"
+                    ? "bg-accent text-accent-foreground"
+                    : "text-foreground/70",
+                )}
+              >
+                <Settings className="h-5 w-5" />
+                Setup
+              </Link>
+            </>
+          )}
+
+          {userRole === "sales" && (
+            <>
+              <Link
+                href="/sales-dashboard"
+                onClick={closeMenu}
+                className={cn(
+                  "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all hover:bg-accent",
+                  pathname === "/sales-dashboard"
+                    ? "bg-accent text-accent-foreground"
+                    : "text-foreground/70",
+                )}
+              >
+                <LayoutDashboard className="h-5 w-5" />
+                Dashboard
+              </Link>
+              <Link
+                href="/sales-entry"
+                onClick={closeMenu}
+                className={cn(
+                  "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all hover:bg-accent",
+                  pathname === "/sales-entry"
+                    ? "bg-accent text-accent-foreground"
+                    : "text-foreground/70",
+                )}
+              >
+                <Package className="h-5 w-5" />
+                Sales Entry
+              </Link>
+              <Link
+                href="/sales-customers"
+                onClick={closeMenu}
+                className={cn(
+                  "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all hover:bg-accent",
+                  pathname === "/sales-customers"
+                    ? "bg-accent text-accent-foreground"
+                    : "text-foreground/70",
+                )}
+              >
+                <Users className="h-5 w-5" />
+                Customers
+              </Link>
+              <Link
+                href="/sales-tables"
+                onClick={closeMenu}
+                className={cn(
+                  "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all hover:bg-accent",
+                  pathname === "/sales-tables"
+                    ? "bg-accent text-accent-foreground"
+                    : "text-foreground/70",
+                )}
+              >
+                <Table className="h-5 w-5" />
+                Sales Records
+              </Link>
+            </>
+          )}
+        </div>
+      </div>
+
+      <div className="border-t p-4">
+        <div className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-destructive hover:bg-destructive/10 transition-all cursor-pointer">
+          <LogOut className="h-5 w-5" />
+          <LogoutButton />
+        </div>
+      </div>
     </div>
   );
 };
@@ -162,7 +206,7 @@ export function LayoutClient({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 w-full">
+      <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 w-full sticky top-0 z-50">
         <nav className="px-4 h-14 w-full flex justify-between items-center">
           <div className="flex items-center">
             <Link href="/" className="mr-6 flex items-center space-x-2">
@@ -285,25 +329,22 @@ export function LayoutClient({ children }: { children: React.ReactNode }) {
             )}
           </div>
 
-          {/* Mobile Navigation */}
+          {/* Mobile Menu Button */}
           <div className="flex items-center md:hidden">
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon">
+                <Button variant="ghost" size="icon" className="h-9 w-9">
                   {mobileMenuOpen ? (
-                    <X className="h-6 w-6" />
+                    <X className="h-5 w-5" />
                   ) : (
-                    <Menu className="h-6 w-6" />
+                    <Menu className="h-5 w-5" />
                   )}
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right">
-                <MobileNav />
+              <SheetContent side="top" className="h-[85vh]">
+                <MobileNav closeMenu={() => setMobileMenuOpen(false)} />
               </SheetContent>
             </Sheet>
-            <div className="ml-2">
-              <LogoutButton />
-            </div>
           </div>
 
           {/* Desktop Logout Button */}
