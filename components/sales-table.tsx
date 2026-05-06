@@ -14,10 +14,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { format } from "date-fns";
+import { Trash2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 // In components/sales-table.tsx
 // In components/sales-table.tsx
 export default function SalesTable() {
+  const { toast } = useToast();
   const [sales, setSales] = useState<Sale[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -102,6 +105,36 @@ export default function SalesTable() {
   if (loading) {
     return <div className="text-center p-4">Loading sales data...</div>;
   }
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this sale record?")) {
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/sales", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete sale");
+      }
+
+      // 从状态中移除已删除的销售记录
+      setSales(sales.filter((sale) => sale.id !== id));
+      toast({
+        title: "Success",
+        description: "Sale record successfully deleted",
+      });
+    } catch (error) {
+      console.error("Error deleting sale:", error);
+      alert("Failed to delete sale. Please try again.");
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -248,6 +281,9 @@ export default function SalesTable() {
                 {sortField === "reinvestment" &&
                   (sortDirection === "asc" ? "↑" : "↓")}
               </TableHead>
+              <TableHead className="cursor-pointer hover:bg-muted/50">
+                Actions
+              </TableHead>
             </TableRow>
           </TableHeader>
 
@@ -273,6 +309,16 @@ export default function SalesTable() {
                 <TableCell>GHS {sale.packagingPayroll.toFixed(2)}</TableCell>
                 <TableCell>GHS {sale.investorShare.toFixed(2)}</TableCell>
                 <TableCell>GHS {sale.reinvestment.toFixed(2)}</TableCell>
+                <TableCell>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleDelete(sale.id)}
+                    className="h-8 w-8 text-red-500 hover:text-red-700"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>

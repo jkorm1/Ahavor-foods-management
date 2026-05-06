@@ -31,7 +31,10 @@ export default function Home() {
       // Fetch sales to get unique days
       const salesResponse = await fetch("/api/sales");
       const salesData = await salesResponse.json();
-      const uniqueDays = salesData.uniqueDays || 0;
+      const uniqueDays =
+        salesData.length > 0
+          ? new Set(salesData.map((sale) => sale.date)).size
+          : 0;
 
       // Fetch losses separately with error handling
       const lossesResponse = await fetch("/api/losses");

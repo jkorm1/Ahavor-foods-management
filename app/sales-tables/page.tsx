@@ -12,6 +12,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { format } from "date-fns";
+import { useToast } from "@/hooks/use-toast";
+import { Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface Sale {
   id: string;
@@ -25,6 +28,7 @@ interface Sale {
 }
 
 export default function SalesTablesPage() {
+  const { toast } = useToast();
   const [sales, setSales] = useState<Sale[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -70,6 +74,42 @@ export default function SalesTablesPage() {
       if (aValue > bValue) return sortDirection === "asc" ? 1 : -1;
       return 0;
     });
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this sale record?")) {
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/sales", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete sale");
+      }
+
+      // Remove the deleted sale from the state
+      setSales(sales.filter((sale) => sale.id !== id));
+
+      // Show success toast
+      toast({
+        title: "Success",
+        description: "Sale record successfully deleted",
+      });
+    } catch (error) {
+      console.error("Error deleting sale:", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete sale. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <div className="container mx-auto py-6">
@@ -157,6 +197,7 @@ export default function SalesTablesPage() {
                       {sortField === "event" &&
                         (sortDirection === "asc" ? "↑" : "↓")}
                     </TableHead>
+                    <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -177,6 +218,16 @@ export default function SalesTablesPage() {
                         GHS {sale.total.toFixed(2)}
                       </TableCell>
                       <TableCell>{sale.event || "Normal"}</TableCell>
+                      <TableCell>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDelete(sale.id)}
+                          className="h-8 w-8 text-red-500 hover:text-red-700"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
