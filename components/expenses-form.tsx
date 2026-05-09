@@ -24,17 +24,15 @@ interface ExpenseItem {
 }
 
 const expenseCategories = [
-  "Flour",
-  "Milk",
-  "Soya",
-  "Package",
-  "Flavour",
-  "Cups",
-  "Tissue",
+  "Tombrown Powder",
+  "Milk Powder",
+  "Sugar",
   "Packaging",
-  "Transport",
-  "Electricity",
-  "Stand",
+  "Transportation",
+  "Labour",
+  "Rubber",
+  "Spoilage Losses",
+  "Marketing",
   "Utilities",
   "Others",
 ];
@@ -55,7 +53,7 @@ export default function ExpensesForm({ onSuccess }) {
     {
       id: "1",
       date: getCurrentDate(),
-      category: "Maize",
+      category: "Tombrown Powder",
       description: "",
       amount: "",
     },
@@ -67,7 +65,7 @@ export default function ExpensesForm({ onSuccess }) {
       {
         id: Date.now().toString(),
         date: getCurrentDate(),
-        category: "Maize",
+        category: "Tombrown Powder",
         description: "",
         amount: "",
       },
@@ -83,12 +81,12 @@ export default function ExpensesForm({ onSuccess }) {
   const updateExpense = (
     id: string,
     field: keyof ExpenseItem,
-    value: string
+    value: string,
   ) => {
     setExpenses((prev) =>
       prev.map((expense) =>
-        expense.id === id ? { ...expense, [field]: value } : expense
-      )
+        expense.id === id ? { ...expense, [field]: value } : expense,
+      ),
     );
   };
 
@@ -106,10 +104,13 @@ export default function ExpensesForm({ onSuccess }) {
     });
 
     if (validationErrors.length > 0) {
-      const errorMap = validationErrors.reduce((acc, err) => {
-        acc[`${err.field}-${err.id}`] = err.message;
-        return acc;
-      }, {} as Record<string, string>);
+      const errorMap = validationErrors.reduce(
+        (acc, err) => {
+          acc[`${err.field}-${err.id}`] = err.message;
+          return acc;
+        },
+        {} as Record<string, string>,
+      );
       setErrors(errorMap);
       toast({
         title: "Validation Error",
@@ -131,7 +132,7 @@ export default function ExpensesForm({ onSuccess }) {
 
         if (!response.ok) {
           throw new Error(
-            `Failed to record expense: ${expense.description || "Unknown"}`
+            `Failed to record expense: ${expense.description || "Unknown"}`,
           );
         }
         return response.json();

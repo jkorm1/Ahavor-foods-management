@@ -33,6 +33,7 @@ import {
 import { getSales, getExpenses } from "@/lib/transaction-store";
 import { useEffect, useState } from "react";
 import InvestorProgress from "./investor-progress";
+import ExpensesPerUnit from "./expenses-per-unit";
 
 interface Sale {
   productionCost?: number;
@@ -448,6 +449,7 @@ export default function Dashboard({ data, onRefresh }) {
           </CardContent>
         </Card>
       </div>
+      <ExpensesPerUnit expensesData={expensesData} salesData={salesData} />
     </div>
   );
 }
