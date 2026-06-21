@@ -39,7 +39,10 @@ export default function EmployeeTable() {
         // Group sales by employee and month
         const sharesByEmployee = sales.reduce(
           (acc, sale) => {
-            const month = format(new Date(sale.date), "MMM yyyy");
+            const month = sale.date
+              ? format(new Date(sale.date), "MMM yyyy")
+              : "Unknown";
+
             const key = `${sale.employee}-${month}`;
 
             if (!acc[key]) {

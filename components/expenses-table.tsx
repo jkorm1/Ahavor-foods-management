@@ -114,8 +114,11 @@ export default function ExpensesTable() {
             {filteredExpenses.map((expense) => (
               <TableRow key={expense.id}>
                 <TableCell>
-                  {format(new Date(expense.date), "MMM d, yyyy")}
+                  {expense.date
+                    ? format(new Date(expense.date), "MMM d, yyyy")
+                    : "N/A"}
                 </TableCell>
+
                 <TableCell>{expense.category}</TableCell>
                 <TableCell>{expense.description}</TableCell>
                 <TableCell>GHS {expense.amount.toFixed(2)}</TableCell>

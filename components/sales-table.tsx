@@ -13,9 +13,29 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { format } from "date-fns";
+import { format, isValid, parseISO } from "date-fns";
 import { Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+
+// Safely format a sale's date string. Never throws — falls back to "N/A"
+// if the date is missing, blank, or in a format Date can't parse (e.g. a
+// stray text value in the sheet's date column).
+function formatSaleDate(dateStr: string) {
+  if (!dateStr || typeof dateStr !== "string" || !dateStr.trim()) {
+    return "N/A";
+  }
+  // sale.date normally comes back as "YYYY-MM-DD" from the API.
+  const isoAttempt = parseISO(dateStr);
+  if (isValid(isoAttempt)) {
+    return format(isoAttempt, "MMM d, yyyy");
+  }
+  // Fall back to a generic Date parse for any other format.
+  const genericAttempt = new Date(dateStr);
+  if (isValid(genericAttempt)) {
+    return format(genericAttempt, "MMM d, yyyy");
+  }
+  return "N/A";
+}
 
 // In components/sales-table.tsx
 // In components/sales-table.tsx
@@ -290,9 +310,7 @@ export default function SalesTable() {
           <TableBody>
             {filteredAndSortedSales.map((sale) => (
               <TableRow key={sale.id}>
-                <TableCell>
-                  {format(new Date(sale.date), "MMM d, yyyy")}
-                </TableCell>
+                <TableCell>{formatSaleDate(sale.date)}</TableCell>
                 <TableCell>{sale.employee}</TableCell>
                 <TableCell>{sale.product}</TableCell>
                 <TableCell>{sale.quantity}</TableCell>
