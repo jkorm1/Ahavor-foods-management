@@ -78,26 +78,33 @@ export default function Dashboard({ data, onRefresh }) {
   }, [toast]);
 
   // Calculate employee shares from sales data
-  const employeeShares = (salesData || []).reduce((acc, sale) => {
-    const employee = sale.employee;
-    const existing = acc.find((e) => e.employee === employee);
-    const total = sale.total || 0;
-    const profitPerPiece = 12.0;
-    const actualProfit = total * (profitPerPiece / 25.0);
-    const salesPayrollShare = actualProfit * (2.7 / 12.0); // Only sales payroll (2.70 of 12.00)
+  const employeeShares = (salesData || [])
+    .reduce((acc, sale) => {
+      const employee = sale.employee;
+      const existing = acc.find((e) => e.employee === employee);
+      const total = sale.total || 0;
+      const profitPerPiece = 12.0;
+      const actualProfit = total * (profitPerPiece / 25.0);
+      const salesPayrollShare = actualProfit * (2.7 / 12.0); // Only sales payroll (2.70 of 12.00)
 
-    if (existing) {
-      existing.totalShare += salesPayrollShare;
-      existing.salesCount += 1;
-    } else {
-      acc.push({
-        employee,
-        totalShare: salesPayrollShare,
-        salesCount: 1,
-      });
-    }
-    return acc;
-  }, []);
+      if (existing) {
+        existing.totalShare += salesPayrollShare;
+        existing.salesCount += 1;
+        existing.totalQuantity += Number(sale.quantity) || 0;
+      } else {
+        acc.push({
+          employee,
+          totalShare: salesPayrollShare,
+          salesCount: 1,
+          totalQuantity: Number(sale.quantity) || 0,
+        });
+      }
+      return acc;
+    }, [])
+    .map((share) => ({
+      ...share,
+      totalShare: parseFloat(share.totalShare.toFixed(2)), // Format to 2 decimal places
+    }));
 
   <Card className="bg-card border-border">
     <CardHeader>
@@ -329,7 +336,7 @@ export default function Dashboard({ data, onRefresh }) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6">
         {/* Sales vs Expenses */}
         <Card className="bg-card border-border">
           <CardHeader>
@@ -390,6 +397,11 @@ export default function Dashboard({ data, onRefresh }) {
                   fill="#06b6d4"
                   name="Total Share (GHS)"
                 />
+                <Bar
+                  dataKey="totalQuantity"
+                  fill="#10b981"
+                  name="Total Quantity"
+                />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
@@ -426,7 +438,7 @@ export default function Dashboard({ data, onRefresh }) {
         </Card>
         <InvestorProgress salesData={salesData} />
         {/* Expense Breakdown */}
-        <Card className="bg-card border-border col-span-1 md:col-span-2">
+        <Card className="bg-card border-border">
           <CardHeader>
             <CardTitle className="text-base">Expense Breakdown</CardTitle>
             <CardDescription>Spending by category</CardDescription>

@@ -15,7 +15,7 @@ interface EmployeeMonthlyShare {
   employee: string;
   month: string;
   totalShare: number;
-  salesCount: number;
+  totalQuantity: number;
 }
 
 export default function EmployeeTable() {
@@ -47,12 +47,12 @@ export default function EmployeeTable() {
                 employee: sale.employee,
                 month,
                 totalShare: 0,
-                salesCount: 0,
+                totalQuantity: 0,
               };
             }
 
             acc[key].totalShare += Number(sale.salesPayroll) || 0;
-            acc[key].salesCount += 1;
+            acc[key].totalQuantity += Number(sale.quantity) || 0;
 
             return acc;
           },
@@ -82,7 +82,7 @@ export default function EmployeeTable() {
               <TableHead>Employee</TableHead>
               <TableHead>Month</TableHead>
               <TableHead>Total Share (GHS)</TableHead>
-              <TableHead>Sales Count</TableHead>
+              <TableHead>Total Quantity</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -91,7 +91,7 @@ export default function EmployeeTable() {
                 <TableCell>{share.employee}</TableCell>
                 <TableCell>{share.month}</TableCell>
                 <TableCell>GHS {share.totalShare.toFixed(2)}</TableCell>
-                <TableCell>{share.salesCount}</TableCell>
+                <TableCell>{share.totalQuantity}</TableCell>
               </TableRow>
             ))}
           </TableBody>
