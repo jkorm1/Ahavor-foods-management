@@ -14,12 +14,50 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Trash2, Plus } from "lucide-react";
 
 const employees = [
+  "Adu Owusu",
+  "Adu Rockson",
+  "Agbenyefia Bella",
+  "Ahenkorah Kendra",
+  "Amoah Lucy",
+  "Ann Blessing",
+  "Atibila Patience",
+  "Agyekum Shirley",
+  "Baafi Perfect Larbi",
+  "Benjamin Opoku",
+  "Bernice Jesuslina",
+  "Boakye Augustine",
+  "Boateng Chris",
+  "Blankson Benedicta",
+  "Clement ADU",
+  "Carlin Serwaa",
+  "Caroline Darkoa",
   "Christian Frimpong",
+  "Darkwa Jireh",
+  "Gabriella Alija Mohammed",
+  "God'stime Victor",
+  "Ibrahim Mohammed",
+  "Isaac Boateng",
+  "Jennifer Ewuresi",
   "Joseph Korm",
-  "Kofi Adu Jnr",
-  "Taufik Yussif",
+  "Josephine Dankwa",
+  "Kofi Andoh",
+  "Kwadwo Obeng",
+  "Laura Makafui",
+  "Marfo Emmanuel",
+  "Mensah Bright",
+  "Meshack Amponsah",
+  "Mukarama Yunus",
+  "Nancy Korankye",
+  "Nathaniel Obeng",
+  "Nyame Lydia",
+  "Owusu Bernard",
+  "Peace Mensah",
+  "Robert Quaicoe",
+  "Setordzi",
+  "Taufik Yusif",
 ];
 
 // Define products with their prices
@@ -36,83 +74,118 @@ const PRODUCTS = [
   },
 ] as const;
 
+let itemCounter = 0;
+function newItem(defaultEmployee: string = employees[0]) {
+  itemCounter += 1;
+  return {
+    key: `item-${Date.now()}-${itemCounter}`,
+    employee: defaultEmployee,
+    productId: "ahavor-tombrown" as string,
+    quantity: "",
+  };
+}
+
 export default function SalesEntryPage() {
   const { toast } = useToast();
-  const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    date: new Date().toISOString().split("T")[0],
-    productId: "ahavor-tombrown", // Default to first product
-    quantity: "",
-    employee: employees[0],
-    event: "Normal",
-    eventName: "",
-  });
   const { salesName } = useAuth();
+  const [loading, setLoading] = useState(false);
 
-  // Set the employee name to the logged-in sales executive
-  useEffect(() => {
-    setFormData((prev) => ({ ...prev, employee: salesName }));
-  }, [salesName]);
+  // Shared fields for the whole batch
+  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
+  const [event, setEvent] = useState("Normal");
+  const [eventName, setEventName] = useState("");
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+  // Line items — each has its own employee, product and quantity
+  const [items, setItems] = useState([newItem(salesName || employees[0])]);
+
+  const updateItem = (key: string, field: string, value: string) => {
+    setItems((prev) =>
+      prev.map((item) =>
+        item.key === key ? { ...item, [field]: value } : item,
+      ),
+    );
   };
 
-  const handleProductChange = (value: string) => {
-    setFormData((prev) => ({ ...prev, productId: value }));
+  const addItem = () => {
+    // New items default to whatever employee is currently selected in the last row
+    const lastEmployee =
+      items[items.length - 1]?.employee || salesName || employees[0];
+    setItems((prev) => [...prev, newItem(lastEmployee)]);
   };
+
+  const removeItem = (key: string) => {
+    setItems((prev) =>
+      prev.length === 1 ? prev : prev.filter((item) => item.key !== key),
+    );
+  };
+
+  const calcLineTotal = (item: { productId: string; quantity: string }) => {
+    const product = PRODUCTS.find((p) => p.id === item.productId);
+    if (!product || !item.quantity) return 0;
+    return parseFloat(item.quantity) * product.price;
+  };
+
+  const grandTotal = items.reduce((sum, item) => sum + calcLineTotal(item), 0);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
 
-    const product = PRODUCTS.find((p) => p.id === formData.productId);
-    if (!product) {
-      toast({
-        title: "Error!",
-        description: "Please select a product",
-        variant: "destructive",
-      });
-      setLoading(false);
-      return;
+    // Validate every line
+    for (const item of items) {
+      const product = PRODUCTS.find((p) => p.id === item.productId);
+      if (!product) {
+        toast({
+          title: "Error!",
+          description: "Please select a product for every item.",
+          variant: "destructive",
+        });
+        return;
+      }
+      if (!item.quantity || Number(item.quantity) <= 0) {
+        toast({
+          title: "Error!",
+          description: "Please enter a quantity greater than 0 for every item.",
+          variant: "destructive",
+        });
+        return;
+      }
     }
 
-    const total = Number(formData.quantity) * product.price;
-    const profitPerPiece = 12.0;
-    const actualProfit = total * (profitPerPiece / 25.0);
+    const eventValue = event === "Normal" ? "Normal" : eventName || "Normal";
 
-    const submissionData = {
-      date: formData.date,
-      employee: formData.employee,
-      product: product.name,
-      price: product.price,
-      quantity: formData.quantity,
-      event:
-        formData.event === "Normal" ? "Normal" : formData.eventName || "Normal",
-      total: total,
-      productionCost: total - actualProfit,
-      tithe: actualProfit * (1.2 / 12.0),
-      founderPay: actualProfit * (1.5 / 12.0),
-      businessSavings: actualProfit * (1.0 / 12.0),
-      leadershipPayroll: actualProfit * (1.0 / 12.0),
-      salesPayroll: actualProfit * (2.7 / 12.0),
-      salesPayrollSavings: actualProfit * (0.3 / 12.0),
-      packagingPayroll: actualProfit * (0.5 / 12.0),
-      investorShare: actualProfit * (1.8 / 12.0),
-      reinvestment: actualProfit * (2.0 / 12.0),
-    };
+    const sales = items.map((item) => {
+      const product = PRODUCTS.find((p) => p.id === item.productId)!;
+      const total = Number(item.quantity) * product.price;
+      const profitPerPiece = 12.0;
+      const actualProfit = total * (profitPerPiece / 25.0);
 
+      return {
+        date,
+        employee: item.employee,
+        product: product.name,
+        price: product.price,
+        quantity: item.quantity,
+        event: eventValue,
+        total,
+        productionCost: total - actualProfit,
+        tithe: actualProfit * (1.2 / 12.0),
+        founderPay: actualProfit * (1.5 / 12.0),
+        businessSavings: actualProfit * (1.0 / 12.0),
+        leadershipPayroll: actualProfit * (1.0 / 12.0),
+        salesPayroll: actualProfit * (2.7 / 12.0),
+        salesPayrollSavings: actualProfit * (0.3 / 12.0),
+        packagingPayroll: actualProfit * (0.5 / 12.0),
+        investorShare: actualProfit * (1.8 / 12.0),
+        reinvestment: actualProfit * (2.0 / 12.0),
+      };
+    });
+
+    setLoading(true);
     try {
       const response = await fetch("/api/sales", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(submissionData),
+        body: JSON.stringify({ sales }),
       });
 
       const responseData = await response.json();
@@ -120,30 +193,30 @@ export default function SalesEntryPage() {
       if (response.ok) {
         toast({
           title: "Success!",
-          description: "Your sale has been recorded successfully.",
+          description:
+            sales.length > 1
+              ? `${sales.length} sales recorded successfully.`
+              : "Your sale has been recorded successfully.",
           variant: "default",
         });
-        setFormData({
-          date: new Date().toISOString().split("T")[0],
-          productId: "ahavor-tombrown",
-          quantity: "",
-          employee: salesName,
-          event: "Normal",
-          eventName: "",
-        });
+        // Reset form
+        setDate(new Date().toISOString().split("T")[0]);
+        setEvent("Normal");
+        setEventName("");
+        setItems([newItem(salesName || employees[0])]);
       } else {
         toast({
           title: "Error!",
           description:
             responseData.error ||
-            "Failed to record your sale. Please try again.",
+            "Failed to record your sale(s). Please try again.",
           variant: "destructive",
         });
       }
     } catch (error) {
       toast({
         title: "Error!",
-        description: "Failed to record your sale. Please try again.",
+        description: "Failed to record your sale(s). Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -151,109 +224,36 @@ export default function SalesEntryPage() {
     }
   };
 
-  const selectedProduct = PRODUCTS.find((p) => p.id === formData.productId);
-  const totalPrice = selectedProduct
-    ? selectedProduct.price * Number(formData.quantity)
-    : 0;
-
   return (
     <div className="container mx-auto py-6">
       <div className="max-w-2xl mx-auto">
         <Card>
           <CardHeader>
-            <CardTitle>Record a Sale</CardTitle>
+            <CardTitle>Record Sales</CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Shared: date */}
               <div className="space-y-2">
                 <Label htmlFor="date">Date</Label>
                 <Input
                   id="date"
-                  name="date"
                   type="date"
-                  value={formData.date}
-                  onChange={handleChange}
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
                   className="bg-input border-border"
                   required
                 />
               </div>
 
+              {/* Shared: event */}
               <div className="space-y-2">
-                <Label htmlFor="employee">Employee</Label>
+                <Label>Event Type</Label>
                 <select
-                  name="employee"
-                  value={formData.employee}
-                  onChange={handleChange}
-                  className="flex h-10 w-full rounded-md border border-border bg-input px-3 py-2 text-sm"
-                >
-                  {employees.map((emp) => (
-                    <option key={emp} value={emp}>
-                      {emp}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="product">Product</Label>
-                <Select
-                  value={formData.productId}
-                  onValueChange={handleProductChange}
-                  required
-                >
-                  <SelectTrigger id="product">
-                    <SelectValue placeholder="Select a product" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {PRODUCTS.map((product) => (
-                      <SelectItem key={product.id} value={product.id}>
-                        {product.name} (GHS {product.price})
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="quantity">Quantity</Label>
-                <Input
-                  id="quantity"
-                  name="quantity"
-                  type="number"
-                  step="0.01"
-                  value={formData.quantity}
-                  onChange={handleChange}
-                  placeholder="0"
-                  className="bg-input border-border"
-                  required
-                />
-              </div>
-
-              {selectedProduct && formData.quantity && (
-                <div className="bg-muted p-3 rounded-md">
-                  <div className="flex justify-between">
-                    <span>Price per unit:</span>
-                    <span>GHS {selectedProduct.price}</span>
-                  </div>
-                  <div className="flex justify-between font-bold mt-2">
-                    <span>Total:</span>
-                    <span>GHS {totalPrice.toFixed(2)}</span>
-                  </div>
-                </div>
-              )}
-
-              <div className="space-y-2">
-                <Label htmlFor="event">Event Type</Label>
-                <select
-                  name="event"
-                  value={formData.event}
+                  value={event}
                   onChange={(e) => {
-                    const value = e.target.value;
-                    setFormData((prev) => ({
-                      ...prev,
-                      event: value,
-                      eventName: value === "Normal" ? "" : prev.eventName,
-                    }));
+                    setEvent(e.target.value);
+                    if (e.target.value === "Normal") setEventName("");
                   }}
                   className="flex h-10 w-full rounded-md border border-border bg-input px-3 py-2 text-sm"
                 >
@@ -262,23 +262,128 @@ export default function SalesEntryPage() {
                 </select>
               </div>
 
-              {formData.event === "Event" && (
+              {event === "Event" && (
                 <div className="space-y-2">
                   <Label htmlFor="eventName">Event Name</Label>
                   <Input
                     id="eventName"
-                    name="eventName"
                     type="text"
-                    value={formData.eventName || ""}
-                    onChange={(e) => {
-                      setFormData((prev) => ({
-                        ...prev,
-                        eventName: e.target.value,
-                      }));
-                    }}
+                    value={eventName}
+                    onChange={(e) => setEventName(e.target.value)}
                     className="bg-input border-border"
                     placeholder="Enter event name"
                   />
+                </div>
+              )}
+
+              {/* Line items */}
+              <div className="border-t border-border pt-4 space-y-4">
+                {items.map((item, index) => {
+                  const lineTotal = calcLineTotal(item);
+                  return (
+                    <div
+                      key={item.key}
+                      className="space-y-3 p-3 rounded-md border border-border bg-muted/30"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-semibold">
+                          Item {index + 1}
+                        </span>
+                        {items.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => removeItem(item.key)}
+                            className="text-destructive hover:opacity-70"
+                            aria-label="Remove item"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        )}
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>Employee</Label>
+                        <select
+                          value={item.employee}
+                          onChange={(e) =>
+                            updateItem(item.key, "employee", e.target.value)
+                          }
+                          className="flex h-10 w-full rounded-md border border-border bg-input px-3 py-2 text-sm"
+                        >
+                          {employees.map((emp) => (
+                            <option key={emp} value={emp}>
+                              {emp}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>Product</Label>
+                        <Select
+                          value={item.productId}
+                          onValueChange={(value) =>
+                            updateItem(item.key, "productId", value)
+                          }
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a product" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {PRODUCTS.map((product) => (
+                              <SelectItem key={product.id} value={product.id}>
+                                {product.name} (GHS {product.price})
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>Quantity</Label>
+                        <Input
+                          type="number"
+                          step="0.01"
+                          value={item.quantity}
+                          onChange={(e) =>
+                            updateItem(item.key, "quantity", e.target.value)
+                          }
+                          placeholder="0"
+                          className="bg-input border-border"
+                          required
+                        />
+                      </div>
+
+                      {item.quantity && (
+                        <div className="text-sm text-muted-foreground text-right">
+                          Line total: GHS {lineTotal.toFixed(2)}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={addItem}
+                  className="w-full"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Another Item
+                </Button>
+              </div>
+
+              {/* Grand total summary */}
+              {grandTotal > 0 && (
+                <div className="bg-muted p-3 rounded-md">
+                  <div className="flex justify-between font-bold">
+                    <span>
+                      Grand Total ({items.length} item
+                      {items.length > 1 ? "s" : ""}):
+                    </span>
+                    <span>GHS {grandTotal.toFixed(2)}</span>
+                  </div>
                 </div>
               )}
 
@@ -287,7 +392,11 @@ export default function SalesEntryPage() {
                 disabled={loading}
                 className="w-full bg-accent hover:bg-accent/90"
               >
-                {loading ? "Recording..." : "Record Sale"}
+                {loading
+                  ? "Recording..."
+                  : items.length > 1
+                    ? `Record ${items.length} Sales`
+                    : "Record Sale"}
               </Button>
             </form>
           </CardContent>

@@ -227,15 +227,35 @@ export default function SalesDashboardPage() {
     };
   });
 
-  // Colors for line chart
-  const LINE_COLORS = [
-    "#0088FE",
-    "#00C49F",
-    "#FFBB28",
-    "#FF8042",
-    "#8884D8",
-    "#82CA9D",
-  ];
+  // Custom tooltip for the employee bar chart showing both GHS total and units
+  const EmployeeTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div
+          style={{
+            backgroundColor: "#f8fafc",
+            border: "1px solid #e2e8f0",
+            borderRadius: "8px",
+            boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1)",
+            padding: "10px 14px",
+          }}
+        >
+          <p style={{ fontWeight: 600, marginBottom: 4 }}>{label}</p>
+          {payload.map((entry: any) => (
+            <p
+              key={entry.dataKey}
+              style={{ color: entry.color, margin: "2px 0" }}
+            >
+              {entry.dataKey === "total"
+                ? `Sales: GHS ${Number(entry.value).toFixed(2)}`
+                : `Units Sold: ${Number(entry.value).toLocaleString()}`}
+            </p>
+          ))}
+        </div>
+      );
+    }
+    return null;
+  };
 
   return (
     <div className="container mx-auto py-6">
@@ -414,7 +434,7 @@ export default function SalesDashboardPage() {
                       vertical={false}
                     />
                     <Tooltip
-                      formatter={(value) => `GHS ${value.toFixed(2)}`}
+                      formatter={(value) => `GHS ${Number(value).toFixed(2)}`}
                       contentStyle={{
                         backgroundColor: "#f8fafc",
                         border: "1px solid #e2e8f0",
@@ -466,26 +486,45 @@ export default function SalesDashboardPage() {
                         axisLine={{ stroke: "#e2e8f0" }}
                         tickLine={{ stroke: "#e2e8f0" }}
                       />
+                      {/* Left axis for GHS sales total */}
                       <YAxis
+                        yAxisId="left"
+                        orientation="left"
                         tick={{ fill: "#64748b" }}
                         axisLine={{ stroke: "#e2e8f0" }}
                         tickLine={{ stroke: "#e2e8f0" }}
+                        tickFormatter={(v) => `GHS ${v}`}
                       />
-                      <Tooltip
-                        formatter={(value) => `GHS ${value.toFixed(2)}`}
-                        contentStyle={{
-                          backgroundColor: "#f8fafc",
-                          border: "1px solid #e2e8f0",
-                          borderRadius: "8px",
-                          boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
-                        }}
+                      {/* Right axis for units quantity */}
+                      <YAxis
+                        yAxisId="right"
+                        orientation="right"
+                        tick={{ fill: "#64748b" }}
+                        axisLine={{ stroke: "#e2e8f0" }}
+                        tickLine={{ stroke: "#e2e8f0" }}
+                        tickFormatter={(v) => `${v} units`}
                       />
-                      <Legend />
+                      <Tooltip content={<EmployeeTooltip />} />
+                      <Legend
+                        formatter={(value) =>
+                          value === "total" ? "Sales (GHS)" : "Units Sold"
+                        }
+                      />
                       <Bar
+                        yAxisId="left"
                         dataKey="total"
+                        name="total"
                         fill="#0088FE"
-                        radius={[8, 8, 0, 0]}
-                        barSize={40}
+                        radius={[6, 6, 0, 0]}
+                        barSize={20}
+                      />
+                      <Bar
+                        yAxisId="right"
+                        dataKey="quantity"
+                        name="quantity"
+                        fill="#00C49F"
+                        radius={[6, 6, 0, 0]}
+                        barSize={20}
                       />
                     </BarChart>
                   </ResponsiveContainer>
@@ -524,7 +563,7 @@ export default function SalesDashboardPage() {
                         ))}
                       </Pie>
                       <Tooltip
-                        formatter={(value) => `GHS ${value.toFixed(2)}`}
+                        formatter={(value) => `GHS ${Number(value).toFixed(2)}`}
                         contentStyle={{
                           backgroundColor: "#f8fafc",
                           border: "1px solid #e2e8f0",
