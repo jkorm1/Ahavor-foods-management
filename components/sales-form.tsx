@@ -101,6 +101,19 @@ export default function SalesForm({ onSuccess }) {
 
   // One or more line items, each its own employee/product/quantity
   const [items, setItems] = useState([newItem()]);
+  // Add this code inside the SalesForm component, after the existing state declarations
+  const filterEmployees = (employees: string[], searchTerm: string) => {
+    if (!searchTerm) return employees;
+    return employees.filter((emp) =>
+      emp.toLowerCase().includes(searchTerm.toLowerCase()),
+    );
+  };
+
+  const [searchTerms, setSearchTerms] = useState<Record<string, string>>({});
+
+  const updateSearchTerm = (key: string, value: string) => {
+    setSearchTerms((prev) => ({ ...prev, [key]: value }));
+  };
 
   const updateItem = (key: string, field: string, value: string) => {
     setItems((prev) =>
@@ -306,19 +319,33 @@ export default function SalesForm({ onSuccess }) {
 
                     <div className="space-y-2">
                       <Label>Employee</Label>
-                      <select
-                        value={item.employee}
-                        onChange={(e) =>
-                          updateItem(item.key, "employee", e.target.value)
-                        }
-                        className="flex h-10 w-full rounded-md border border-border bg-input px-3 py-2 text-sm"
-                      >
-                        {employees.map((emp) => (
-                          <option key={emp} value={emp}>
-                            {emp}
-                          </option>
-                        ))}
-                      </select>
+                      <div className="relative">
+                        <Input
+                          type="text"
+                          placeholder="Search employee..."
+                          value={searchTerms[item.key] || ""}
+                          onChange={(e) =>
+                            updateSearchTerm(item.key, e.target.value)
+                          }
+                          className="mb-2 bg-input border-border"
+                        />
+                        <select
+                          value={item.employee}
+                          onChange={(e) =>
+                            updateItem(item.key, "employee", e.target.value)
+                          }
+                          className="flex h-10 w-full rounded-md border border-border bg-input px-3 py-2 text-sm"
+                        >
+                          {filterEmployees(
+                            employees,
+                            searchTerms[item.key] || "",
+                          ).map((emp) => (
+                            <option key={emp} value={emp}>
+                              {emp}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
                     </div>
 
                     <div className="space-y-2">
@@ -373,7 +400,7 @@ export default function SalesForm({ onSuccess }) {
                 className="w-full"
               >
                 <Plus className="h-4 w-4 mr-2" />
-                Add Another Item
+                Add Another Sale
               </Button>
             </div>
 
