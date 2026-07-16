@@ -240,7 +240,9 @@ export default function SalesDashboardPage() {
             padding: "10px 14px",
           }}
         >
-          <p style={{ fontWeight: 600, marginBottom: 4 }}>{label}</p>
+          <p style={{ fontWeight: 600, marginBottom: 4, color: "#1e293b" }}>
+            {label}
+          </p>
           {payload.map((entry: any) => (
             <p
               key={entry.dataKey}
@@ -463,7 +465,7 @@ export default function SalesDashboardPage() {
           </Card>
 
           {/* Sales by Employee and Product */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          <div className="grid grid-cols-1 lg:grid-cols-1 gap-6 mb-6">
             <Card>
               <CardHeader>
                 <CardTitle>Sales by Employee</CardTitle>

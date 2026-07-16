@@ -108,6 +108,7 @@ export default function SalesEntryPage() {
 
   // 在updateItem函数后添加搜索状态管理
   const [searchTerms, setSearchTerms] = useState<Record<string, string>>({});
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
   const updateSearchTerm = (key: string, value: string) => {
     setSearchTerms((prev) => ({ ...prev, [key]: value }));
@@ -322,28 +323,50 @@ export default function SalesEntryPage() {
                           <Input
                             type="text"
                             placeholder="Search employee..."
-                            value={searchTerms[item.key] || ""}
-                            onChange={(e) =>
-                              updateSearchTerm(item.key, e.target.value)
-                            }
-                            className="mb-2 bg-input border-border"
+                            value={searchTerms[item.key] ?? item.employee}
+                            onChange={(e) => {
+                              updateSearchTerm(item.key, e.target.value);
+                              setOpenDropdown(item.key);
+                            }}
+                            onFocus={() => {
+                              updateSearchTerm(item.key, "");
+                              setOpenDropdown(item.key);
+                            }}
+                            onBlur={() => {
+                              // slight delay so the click on a list item registers first
+                              setTimeout(() => setOpenDropdown(null), 150);
+                            }}
+                            className="bg-input border-border"
                           />
-                          <select
-                            value={item.employee}
-                            onChange={(e) =>
-                              updateItem(item.key, "employee", e.target.value)
-                            }
-                            className="flex h-10 w-full rounded-md border border-border bg-input px-3 py-2 text-sm"
-                          >
-                            {filterEmployees(
-                              employees,
-                              searchTerms[item.key] || "",
-                            ).map((emp) => (
-                              <option key={emp} value={emp}>
-                                {emp}
-                              </option>
-                            ))}
-                          </select>
+                          {openDropdown === item.key && (
+                            <div className="absolute z-10 mt-1 w-full max-h-48 overflow-y-auto rounded-md border border-border bg-popover shadow-md">
+                              {filterEmployees(
+                                employees,
+                                searchTerms[item.key] || "",
+                              ).map((emp) => (
+                                <div
+                                  key={emp}
+                                  onMouseDown={(e) => {
+                                    e.preventDefault(); // prevents blur firing before click
+                                    updateItem(item.key, "employee", emp);
+                                    updateSearchTerm(item.key, emp);
+                                    setOpenDropdown(null);
+                                  }}
+                                  className="px-3 py-2 text-sm cursor-pointer hover:bg-accent hover:text-accent-foreground"
+                                >
+                                  {emp}
+                                </div>
+                              ))}
+                              {filterEmployees(
+                                employees,
+                                searchTerms[item.key] || "",
+                              ).length === 0 && (
+                                <div className="px-3 py-2 text-sm text-muted-foreground">
+                                  No matches
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </div>
                       </div>
 
