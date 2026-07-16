@@ -36,7 +36,7 @@ const employees = [
   "Boakye Augustine",
   "Boateng Chris",
   "Blankson Benedicta",
-  "Clement ADU",
+  "Clement Adu",
   "Carlin Serwaa",
   "Caroline Darkoa",
   "Christian Frimpong",
