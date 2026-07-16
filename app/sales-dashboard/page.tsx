@@ -276,12 +276,12 @@ export default function SalesDashboardPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <Card>
               <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
+                <CardTitle className="text-sm font-medium text-muted-foreground ">
                   Total Sales
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">
+                <div className="text-2xl font-bold text-green-600">
                   GHS {totalSales.toFixed(2)}
                 </div>
               </CardContent>
@@ -294,7 +294,9 @@ export default function SalesDashboardPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{totalQuantity}</div>
+                <div className="text-2xl font-bold text-accent">
+                  {totalQuantity}
+                </div>
               </CardContent>
             </Card>
 
