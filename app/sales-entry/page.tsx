@@ -36,6 +36,7 @@ const employees = [
   "Caroline Darkoa",
   "Christian Frimpong",
   "Darkwa Jireh",
+  "David Room",
   "Gabriella Alija Mohammed",
   "God'stime Victor",
   "Ibrahim Mohammed",
